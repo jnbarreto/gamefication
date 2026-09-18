@@ -1,4 +1,4 @@
-# Leone Dev RPG (`gamefication`)
+#  Developer RPG(`gamefication`)
 
 Personal gamification app — turn professional growth into an RPG with XP, quests, skills, and evidence.
 
