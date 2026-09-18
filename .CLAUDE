@@ -1,0 +1,94 @@
+# CLAUDE.md — Leone Dev RPG (`gamefication`)
+
+Personal gamification app. Transform professional growth into XP, quests, skills, and evidence.
+
+## Stack
+
+| Layer | Tech |
+|-------|------|
+| API | Node.js 20+, TypeScript, Express, PostgreSQL (raw SQL + `pg`) |
+| Web | Vite, React 19, Tailwind CSS, react-i18next (later) |
+| Architecture | Clean Architecture — domain → application → infrastructure → interfaces |
+
+## Monorepo
+
+```
+apps/
+├── api/   @gamefication/api
+└── web/   @gamefication/web
+.specs/    Spec-driven artifacts (STATE.md, features/)
+```
+
+## Commands
+
+| Command | Purpose |
+|---------|---------|
+| `npm install` | Install all workspaces |
+| `npm run dev:api` | API on :3000 |
+| `npm run dev:web` | Web on :5173 (proxies /api → :3000) |
+| `npm run dev` | Both workspaces |
+| `npm run typecheck` | Type-check all workspaces |
+| `npm run build` | Build all workspaces |
+| `npm run lint` | ESLint all workspaces |
+| `npm run format:check` | Prettier check |
+| `npm run check` | format + lint + typecheck + test |
+| `npm run test` | Run all workspace tests |
+| `npm run test:api` | Jest tests for API |
+| `npm run migrate` | Run pending DB migrations manually |
+| `npm run docker:up` | Postgres + API via Docker Compose |
+| `npm run docker:down` | Stop containers |
+| `npm run docker:logs` | Follow container logs |
+
+## Architecture rules (API)
+
+| Layer | Path | Can import |
+|-------|------|------------|
+| Domain | `src/domain/` | domain only |
+| Application | `src/application/` | domain, application |
+| Infrastructure | `src/infrastructure/` | domain, application, infrastructure |
+| Interfaces | `src/interfaces/` | all layers |
+
+**Rules:**
+- Business logic in domain entities and use cases — never in controllers
+- Controllers: parse → use case → response
+- Repository interfaces in `application/repository/`, impl in `infrastructure/repository/`
+- SQL raw with `$1, $2` params — no ORM
+- Entities: private constructor, `create()` + `rebuild()` statics
+- XP transactions are append-only — never delete or mutate
+- No auth in MVP — single-user localhost
+
+## Product rules
+
+1. Production > consumption
+2. Evidence > declaration
+3. No XP loss — ever
+4. Rest is not failure
+5. Daily quests: soft limit ~3/day (warn, don't block)
+6. Streak: ≥1 quest completed per day
+7. Achievements MVP: manual unlock only
+
+## Decisions
+
+See `.specs/STATE.md` for AD-001 through AD-020.
+
+## Development workflow
+
+Microtasks — one atomic step at a time:
+1. Explain objective
+2. List files
+3. Explain technical decision
+4. Implement
+5. Verify (typecheck/tests)
+6. Propose next microtask
+
+Do not batch multiple phases. Do not over-engineer abstractions.
+
+## What NOT to do
+
+- No ORM, no IoC container, no barrel `index.ts` re-exports
+- No business logic in Express route handlers
+- No `throw new Error()` — use typed errors (`DomainError`, `ApplicationError`, `InfraError`, `ValidationError`)
+- Controllers use `asyncHandler` — never try/catch; errors propagate to `errorHandler`
+- No auth/multi-user until explicitly scoped
+- No auto achievement triggers in MVP
+- No Boss entity — Boss is a quest type only

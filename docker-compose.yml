@@ -1,0 +1,66 @@
+services:
+  postgres:
+    image: postgres:16-alpine
+    container_name: gamefication-postgres
+    environment:
+      POSTGRES_USER: gamefication
+      POSTGRES_PASSWORD: gamefication
+      POSTGRES_DB: gamefication
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U gamefication -d gamefication"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+      start_period: 10s
+
+  api:
+    build:
+      context: .
+      dockerfile: docker/Dockerfile.api
+    container_name: gamefication-api
+    ports:
+      - "3000:3000"
+    environment:
+      PORT: "3000"
+      DATABASE_URL: postgres://gamefication:gamefication@postgres:5432/gamefication
+      TIMEZONE: America/Sao_Paulo
+      JWT_SECRET: dev-jwt-secret-change-me
+      JWT_EXPIRES_IN: 7d
+      SEED_ADMIN_EMAIL: admin@gamefication.local
+      SEED_ADMIN_PASSWORD: admin123
+      APP_WEB_URL: http://localhost:5173
+    volumes:
+      # Hot-reload: mount source, keep container node_modules
+      - ./apps/api/src:/app/apps/api/src
+      - ./apps/api/tsconfig.json:/app/apps/api/tsconfig.json
+      - ./apps/api/tsconfig.build.json:/app/apps/api/tsconfig.build.json
+    depends_on:
+      postgres:
+        condition: service_healthy
+
+  web:
+    build:
+      context: .
+      dockerfile: docker/Dockerfile.web
+    container_name: gamefication-web
+    ports:
+      - "5173:5173"
+    environment:
+      VITE_PROXY_TARGET: http://api:3000
+    volumes:
+      - ./apps/web/src:/app/apps/web/src
+      - ./apps/web/index.html:/app/apps/web/index.html
+      - ./apps/web/assets:/app/apps/web/assets
+      - ./apps/web/public:/app/apps/web/public
+      - ./apps/web/vite.config.ts:/app/apps/web/vite.config.ts
+      - ./apps/web/tailwind.config.js:/app/apps/web/tailwind.config.js
+      - ./apps/web/postcss.config.js:/app/apps/web/postcss.config.js
+    depends_on:
+      - api
+
+volumes:
+  postgres_data:

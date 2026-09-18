@@ -1,0 +1,32 @@
+@import "./styles/tokens.css";
+@import "./styles/components.css";
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  html {
+    @apply bg-base font-sans text-foreground antialiased;
+  }
+
+  body {
+    @apply m-0 min-h-screen bg-base text-body;
+  }
+
+  h1 {
+    @apply text-h1;
+  }
+
+  h2 {
+    @apply text-h2;
+  }
+
+  h3 {
+    @apply text-h3;
+  }
+
+  code {
+    @apply rounded-panel bg-surface-muted px-1 py-0.5 font-mono text-small;
+  }
+}

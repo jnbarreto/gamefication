@@ -1,0 +1,1488 @@
+@layer components {
+  .ds-app-header {
+    --ds-header-stack: 3.25rem;
+    @apply sticky top-0 z-40 border-b border-border/25 bg-surface/95 backdrop-blur-sm;
+  }
+
+  @media (min-width: 1024px) {
+    .ds-app-header {
+      --ds-header-stack: 4rem;
+    }
+  }
+
+  .ds-app-header__inner {
+    @apply mx-auto grid max-w-6xl gap-4 px-4 py-3 sm:px-6 lg:grid-cols-[minmax(0,1fr)_auto_minmax(0,1fr)] lg:items-center lg:gap-6 lg:py-4;
+  }
+
+  .ds-app-header__brand {
+    @apply min-w-0 justify-self-start;
+  }
+
+  .ds-app-header__nav {
+    @apply min-w-0 lg:justify-self-center;
+  }
+
+  .ds-app-header__nav-list {
+    @apply flex flex-wrap gap-2 lg:justify-center;
+  }
+
+  .ds-app-header__actions {
+    @apply flex flex-wrap items-center justify-end gap-2 justify-self-end;
+  }
+
+  .ds-app-nav-link {
+    @apply ds-focus inline-flex rounded-panel bg-transparent px-3 py-2 text-body font-medium text-foreground-muted transition-colors duration-fast ease-out hover:text-accent;
+  }
+
+  .ds-app-nav-link--active {
+    @apply bg-transparent text-accent hover:text-accent;
+  }
+
+  .ds-app-main {
+    @apply mx-auto max-w-6xl px-4 py-6 sm:px-6 lg:py-8;
+  }
+
+  .ds-brand-title {
+    @apply font-mono text-h2 font-bold tracking-[0.08em] text-accent;
+  }
+
+  .ds-dashboard-grid {
+    @apply grid gap-5 lg:gap-6;
+  }
+
+  .ds-dashboard-hero-row {
+    @apply grid gap-5 lg:grid-cols-[minmax(0,7fr)_minmax(0,3fr)] lg:items-stretch;
+  }
+
+  .ds-dashboard-hero-row .ds-character-sheet {
+    @apply min-h-full;
+  }
+
+  .ds-streak-sidebar {
+    @apply flex min-h-full min-w-0 flex-col gap-4 rounded-panel border border-border/25 bg-surface p-4 shadow-[inset_0_1px_0_rgba(255,255,255,0.03)];
+  }
+
+  .ds-streak-sidebar__title {
+    @apply text-small font-semibold text-foreground;
+  }
+
+  .ds-streak-sidebar__stats {
+    @apply grid grid-cols-2 gap-3;
+  }
+
+  .ds-streak-sidebar__stat {
+    @apply min-w-0;
+  }
+
+  .ds-streak-sidebar__stat-label {
+    @apply text-micro text-foreground-muted;
+  }
+
+  .ds-streak-sidebar__stat-value {
+    @apply mt-1 text-h2 font-semibold leading-none text-accent;
+  }
+
+  .ds-character-sheet {
+    @apply grid gap-5 rounded-panel border border-border/30 bg-surface p-5 sm:p-6 lg:grid-cols-[auto_minmax(0,1fr)] lg:items-stretch lg:gap-6;
+  }
+
+  .ds-character-sheet__portrait {
+    @apply flex items-start justify-center lg:justify-start;
+  }
+
+  .ds-character-sheet__body {
+    @apply min-w-0 space-y-5;
+  }
+
+  .ds-character-sheet__head {
+    @apply flex flex-col gap-5 lg:flex-row lg:items-start lg:justify-between;
+  }
+
+  .ds-character-sheet__day {
+    @apply font-mono text-micro text-foreground-muted;
+  }
+
+  .ds-character-sheet__name {
+    @apply mt-1 text-h1 text-foreground;
+  }
+
+  .ds-character-sheet__classline {
+    @apply mt-1 text-small text-foreground-muted;
+  }
+
+  .ds-character-sheet__rank {
+    @apply mt-1 font-mono text-micro text-accent;
+  }
+
+  .ds-character-sheet__stats {
+    @apply grid shrink-0 grid-cols-3 gap-3 sm:gap-5;
+  }
+
+  .ds-character-sheet__stats .ds-stat__value {
+    @apply text-h1 leading-none;
+  }
+
+  .ds-character-portrait {
+    @apply flex h-28 w-28 items-center justify-center overflow-hidden rounded-panel border border-accent/35 bg-surface-muted sm:h-32 sm:w-32;
+  }
+
+  .ds-character-portrait--interactive {
+    @apply relative cursor-pointer p-0 transition-colors hover:border-accent/60;
+  }
+
+  .ds-character-portrait--empty {
+    @apply border-dashed border-border/50 bg-surface-elevated/60;
+  }
+
+  .ds-character-portrait__image {
+    @apply h-full w-full object-contain object-center;
+  }
+
+  .ds-character-portrait__overlay {
+    @apply absolute inset-0 flex items-center justify-center bg-base/80 px-2 text-center text-micro font-medium text-foreground opacity-0 transition-opacity group-hover:opacity-100 group-focus-visible:opacity-100;
+  }
+
+  .ds-character-portrait__glyph {
+    @apply font-mono text-h1 text-accent/35;
+  }
+
+  .ds-avatar-picker-modal {
+    @apply max-w-md;
+  }
+
+  .ds-avatar-picker__grid {
+    @apply grid grid-cols-4 gap-3 p-5 pt-0;
+  }
+
+  .ds-avatar-picker__option {
+    @apply overflow-hidden rounded-panel border border-border/40 bg-surface-muted p-0 transition-colors hover:border-accent/40;
+  }
+
+  .ds-avatar-picker__option--selected {
+    @apply border-accent ring-2 ring-accent/35;
+  }
+
+  .ds-avatar-picker__image {
+    @apply aspect-square h-full w-full object-contain object-center;
+  }
+
+  .ds-linear-progress {
+    @apply space-y-2;
+  }
+
+  .ds-linear-progress__meta {
+    @apply flex items-center justify-between gap-3 text-small text-foreground-muted;
+  }
+
+  .ds-linear-progress__label {
+    @apply font-mono text-micro text-foreground;
+  }
+
+  .ds-linear-progress__percent {
+    @apply font-mono text-micro;
+  }
+
+  .ds-linear-progress__track {
+    @apply h-2 overflow-hidden rounded-panel bg-surface-muted;
+  }
+
+  .ds-linear-progress__fill {
+    @apply h-full rounded-panel bg-accent transition-[width] duration-slow ease-out;
+  }
+
+  .ds-linear-progress__hint {
+    @apply font-mono text-micro text-foreground-muted;
+  }
+
+  .ds-streak-panel {
+    @apply space-y-5;
+  }
+
+  .ds-streak-panel__stats {
+    @apply grid gap-4 sm:grid-cols-2;
+  }
+
+  .ds-streak-panel__stats .ds-stat__value {
+    @apply text-h2 leading-none;
+  }
+
+  .ds-streak-heatmap-shell {
+    @apply min-w-0 space-y-2 overflow-x-auto;
+  }
+
+  .ds-streak-month-heatmap {
+    @apply mt-auto grid grid-cols-7 gap-1;
+  }
+
+  .ds-streak-month-heatmap__column {
+    @apply flex min-w-0 flex-col items-center gap-0.5;
+  }
+
+  .ds-streak-month-heatmap__column--padding {
+    @apply pointer-events-none opacity-0;
+  }
+
+  .ds-streak-month-heatmap__date {
+    @apply font-mono text-[0.58rem] leading-none text-foreground-muted;
+  }
+
+  .ds-streak-month-heatmap__pill {
+    @apply block h-2 w-full rounded-full border border-transparent;
+  }
+
+  .ds-streak-month-heatmap__pill--level-0 {
+    @apply bg-surface-muted/90;
+  }
+
+  .ds-streak-month-heatmap__pill--level-1 {
+    @apply bg-accent/25;
+  }
+
+  .ds-streak-month-heatmap__pill--level-2 {
+    @apply bg-accent/45;
+  }
+
+  .ds-streak-month-heatmap__pill--level-3 {
+    @apply bg-accent/70;
+  }
+
+  .ds-streak-month-heatmap__pill--level-4 {
+    @apply bg-accent shadow-[0_0_6px_rgba(0,255,102,0.3)];
+  }
+
+  .ds-streak-month-heatmap__pill--future {
+    @apply bg-transparent opacity-30;
+  }
+
+  .ds-streak-heatmap-layout {
+    @apply flex min-w-0 items-start gap-2;
+  }
+
+  .ds-streak-heatmap-weekdays {
+    @apply grid shrink-0 grid-rows-7 gap-1 text-micro text-foreground-muted;
+  }
+
+  .ds-streak-heatmap-weekdays__label {
+    @apply flex h-3 items-center justify-end leading-none;
+  }
+
+  .ds-streak-heatmap {
+    @apply grid grid-flow-col gap-1;
+    grid-template-rows: repeat(7, minmax(0, 0.75rem));
+    min-width: min(100%, 14rem);
+  }
+
+  .ds-streak-heatmap__cell {
+    @apply block h-3 w-full min-w-[0.65rem] rounded-[2px] border border-transparent bg-surface-muted;
+  }
+
+  .ds-streak-heatmap__cell--level-0 {
+    @apply bg-surface-muted/80;
+  }
+
+  .ds-streak-heatmap__cell--level-1 {
+    @apply bg-accent/20;
+  }
+
+  .ds-streak-heatmap__cell--level-2 {
+    @apply bg-accent/40;
+  }
+
+  .ds-streak-heatmap__cell--level-3 {
+    @apply bg-accent/65;
+  }
+
+  .ds-streak-heatmap__cell--level-4 {
+    @apply bg-accent;
+  }
+
+  .ds-streak-heatmap__cell--future {
+    @apply bg-transparent opacity-35;
+  }
+
+  .ds-streak-heatmap-legend {
+    @apply flex items-center justify-end gap-1 pt-1;
+  }
+
+  .ds-streak-heatmap-legend__label {
+    @apply px-1 text-micro text-foreground-muted;
+  }
+
+  .ds-streak-heatmap-legend .ds-streak-heatmap__cell {
+    @apply h-3 w-3 min-w-[0.65rem];
+  }
+
+  .ds-skill-highlight-list {
+    @apply space-y-4;
+  }
+
+  .ds-skill-highlight {
+    @apply space-y-2 rounded-panel border border-border/20 bg-surface-muted/40 p-3;
+  }
+
+  .ds-skill-highlight__head {
+    @apply flex items-start justify-between gap-3;
+  }
+
+  .ds-skill-highlight__name {
+    @apply text-small font-medium text-foreground;
+  }
+
+  .ds-skill-highlight__xp {
+    @apply shrink-0 font-mono text-micro text-accent;
+  }
+
+  .ds-skill-highlight__mastery {
+    @apply font-mono text-micro;
+  }
+
+  .ds-panel {
+    @apply rounded-panel border border-border/25 bg-surface p-6 shadow-[inset_0_1px_0_rgba(255,255,255,0.03)];
+  }
+
+  .ds-panel--compact {
+    @apply p-4;
+  }
+
+  .ds-panel--sidebar {
+    @apply p-3;
+  }
+
+  .ds-panel--sidebar .ds-panel__title {
+    @apply text-small font-semibold;
+  }
+
+  .ds-panel--sidebar .ds-panel__body {
+    @apply mt-2;
+  }
+
+  .ds-panel--compact .ds-panel__body {
+    @apply mt-3;
+  }
+
+  .ds-panel__title {
+    @apply text-h2 font-semibold text-foreground;
+  }
+
+  .ds-panel__body {
+    @apply mt-4;
+  }
+
+  .ds-stat {
+    @apply grid gap-1;
+  }
+
+  .ds-stat__label {
+    @apply text-small text-foreground-muted;
+  }
+
+  .ds-stat__value {
+    @apply font-mono text-stat font-semibold text-foreground;
+  }
+
+  .ds-badge {
+    @apply inline-flex rounded-badge px-2.5 py-1 font-mono text-micro font-medium;
+  }
+
+  .ds-badge--accent {
+    @apply bg-accent/15 text-accent;
+  }
+
+  .ds-badge--success {
+    @apply bg-success/15 text-success;
+  }
+
+  .ds-badge--warning {
+    @apply bg-warning/15 text-warning;
+  }
+
+  .ds-badge--muted {
+    @apply bg-surface-muted text-foreground-muted;
+  }
+
+  .ds-btn-primary {
+    @apply ds-focus rounded-panel bg-accent px-3 py-2 text-small font-medium text-base transition-colors duration-fast ease-out hover:bg-accent-hover;
+  }
+
+  .ds-btn-primary-compact {
+    @apply ds-focus rounded-panel bg-accent px-2 py-1 text-micro font-medium text-base transition-colors duration-fast ease-out hover:bg-accent-hover disabled:opacity-50;
+  }
+
+  .ds-btn-success {
+    @apply ds-focus rounded-panel bg-accent-dark px-3 py-2 text-small font-medium text-base transition-colors duration-fast ease-out hover:bg-accent;
+  }
+
+  .ds-quest-item--compact {
+    @apply p-2.5;
+  }
+
+  .ds-scroll-area {
+    @apply overflow-y-auto overscroll-y-contain;
+    max-height: 15rem;
+    scrollbar-width: none;
+    -ms-overflow-style: none;
+  }
+
+  .ds-scroll-area::-webkit-scrollbar {
+    display: none;
+  }
+
+  .ds-scroll-area--tall {
+    max-height: 18.5rem;
+  }
+
+  .ds-scroll-area--short {
+    max-height: 11.5rem;
+  }
+
+  .ds-scroll-area--sidebar {
+    max-height: min(22rem, 42vh);
+  }
+
+  .ds-scroll-area--sidebar-short {
+    max-height: min(15rem, 28vh);
+  }
+
+  .ds-xp-track--compact {
+    @apply h-1;
+  }
+
+  .ds-xp-track-compact {
+    @apply mt-2 space-y-1;
+  }
+
+  .ds-xp-track-compact__meta {
+    @apply flex items-center justify-between gap-2 text-micro text-foreground-muted;
+  }
+
+  .ds-xp-track-compact__label {
+    @apply min-w-0 truncate;
+  }
+
+  .ds-xp-track-compact__pct {
+    @apply shrink-0 font-mono;
+  }
+
+  .ds-skill-detail-strip {
+    @apply rounded-panel border border-accent/25 bg-surface/80 p-2.5;
+    box-shadow: inset 0 0 0 1px rgb(var(--color-accent) / 0.06);
+  }
+
+  .ds-skill-detail-strip__head {
+    @apply flex items-start justify-between gap-2;
+  }
+
+  .ds-skill-detail-strip__name {
+    @apply min-w-0 truncate text-small font-semibold text-foreground;
+  }
+
+  .ds-skill-detail-strip__xp {
+    @apply shrink-0 font-mono text-micro font-semibold text-xp;
+  }
+
+  .ds-skill-detail-strip__meta {
+    @apply mt-1 flex flex-wrap items-center gap-x-1.5 gap-y-0.5 text-micro text-foreground-muted;
+  }
+
+  .ds-skill-detail-strip__info {
+    @apply flex h-5 w-5 items-center justify-center rounded-full border border-info/40 bg-info/10 font-mono text-micro font-semibold text-info;
+  }
+
+  .ds-panel--skill-tree {
+    @apply p-0;
+  }
+
+  .ds-skill-tree-sticky {
+    @apply sticky z-20 space-y-3 border-b border-border/20 bg-surface/95 px-6 pb-4 pt-6 backdrop-blur-sm;
+    top: calc(var(--ds-header-stack, 4rem) + 0.5rem);
+    box-shadow:
+      0 0 0 1px rgb(var(--color-border) / 0.08),
+      0 8px 24px rgb(var(--color-base) / 0.35);
+  }
+
+  .ds-skill-tree-sidebar {
+    @apply lg:sticky lg:self-start;
+    top: calc(var(--ds-header-stack, 4rem) + 0.5rem);
+  }
+
+  .ds-skill-tree-toolbar {
+    @apply rounded-panel border border-border/20 bg-surface/80 p-2.5;
+  }
+
+  .ds-skill-tree-toolbar__actions {
+    @apply flex flex-wrap items-center gap-2;
+  }
+
+  .ds-skill-tree-toolbar__btn--active {
+    @apply bg-accent-dark;
+  }
+
+  .ds-skill-tree-toolbar__cancel {
+    @apply text-micro text-foreground-muted hover:text-foreground;
+  }
+
+  .ds-skill-tree-toolbar__hint {
+    @apply mt-2 rounded-panel border border-info/25 bg-info/10 p-2 text-micro text-foreground;
+  }
+
+  .ds-quest-missions {
+    @apply rounded-panel border border-border/15 bg-base/20 p-2;
+  }
+
+  .ds-quest-missions__heading {
+    @apply mb-1.5 font-mono text-micro uppercase tracking-wide text-foreground-muted;
+  }
+
+  .ds-quest-missions__list {
+    @apply space-y-1;
+  }
+
+  .ds-quest-missions__item {
+    @apply flex cursor-pointer items-start gap-2 text-micro text-foreground;
+  }
+
+  .ds-quest-missions__item input {
+    @apply mt-0.5 shrink-0 accent-accent;
+  }
+
+  .ds-quest-missions__hint {
+    @apply mt-2 text-micro text-warning;
+  }
+
+  .ds-skill-tree-shell {
+    @apply relative min-h-[24rem] px-6 pb-6;
+  }
+
+  .ds-skill-tree-content {
+    @apply pt-4;
+  }
+
+  .ds-skill-create-modal {
+    @apply absolute inset-0 z-20 flex items-start justify-center bg-base/60 p-4 pt-8 backdrop-blur-[2px];
+  }
+
+  .ds-skill-create-modal__panel {
+    @apply w-full max-w-md rounded-panel border border-accent/30 bg-surface p-4 shadow-xl;
+    box-shadow:
+      0 0 0 1px rgb(var(--color-accent) / 0.08),
+      0 16px 40px rgb(var(--color-base) / 0.45);
+  }
+
+  .ds-skill-create-modal__head {
+    @apply flex items-start justify-between gap-3;
+  }
+
+  .ds-skill-create-modal__title {
+    @apply text-small font-semibold text-foreground;
+  }
+
+  .ds-skill-create-modal__close {
+    @apply shrink-0 text-micro text-foreground-muted hover:text-foreground;
+  }
+
+  .ds-skill-create-modal__form {
+    @apply mt-4 space-y-3;
+  }
+
+  .ds-skill-create-modal__mode {
+    @apply mt-4 grid grid-cols-2 gap-1 rounded-panel border border-border/20 bg-base/30 p-1;
+  }
+
+  .ds-skill-create-modal__mode-btn {
+    @apply rounded-panel px-2 py-1.5 text-micro text-foreground-muted transition-colors;
+  }
+
+  .ds-skill-create-modal__mode-btn--active {
+    @apply bg-accent/15 text-foreground;
+  }
+
+  .ds-skill-create-modal__hint {
+    @apply text-micro leading-relaxed text-foreground-muted;
+  }
+
+  .ds-skill-create-modal__field {
+    @apply grid gap-1.5 text-micro text-foreground-muted;
+  }
+
+  .ds-skill-create-modal__field legend {
+    @apply mb-1 text-micro text-foreground-muted;
+  }
+
+  .ds-skill-create-modal__input,
+  .ds-skill-create-modal__textarea {
+    @apply w-full rounded-panel border border-border/25 bg-base/40 px-2.5 py-2 text-small text-foreground;
+  }
+
+  .ds-skill-create-modal__actions {
+    @apply flex items-center justify-end gap-2 border-t border-border/20 pt-3;
+  }
+
+  .ds-skill-create-modal__cancel {
+    @apply rounded-panel px-2.5 py-1.5 text-micro text-foreground-muted hover:text-foreground;
+  }
+
+  .ds-skill-parent-picker {
+    max-height: 11rem;
+    @apply rounded-panel border border-border/20 bg-base/30 p-1;
+  }
+
+  .ds-skill-parent-picker__group + .ds-skill-parent-picker__group {
+    @apply mt-2 border-t border-border/15 pt-2;
+  }
+
+  .ds-skill-parent-picker__heading {
+    @apply px-2 py-1 font-mono text-micro text-info;
+  }
+
+  .ds-skill-parent-picker__list {
+    @apply space-y-0.5;
+  }
+
+  .ds-skill-parent-picker__option {
+    @apply flex cursor-pointer items-center gap-2 rounded-panel px-2 py-1.5 text-micro text-foreground transition-colors hover:bg-surface-muted/40;
+  }
+
+  .ds-skill-parent-picker__option--selected {
+    @apply bg-accent/10 text-accent;
+  }
+
+  .ds-skill-parent-picker__option input {
+    @apply shrink-0 accent-accent;
+  }
+
+  .ds-skill-detail-strip__delete {
+    @apply mt-2 w-full rounded-panel border border-danger/30 bg-danger/10 px-2 py-1.5 text-micro text-danger disabled:opacity-50;
+  }
+
+  .ds-modal {
+    @apply fixed inset-0 z-50 flex items-center justify-center bg-base/70 p-4 backdrop-blur-sm;
+  }
+
+  .ds-modal__panel {
+    @apply w-full max-w-md rounded-panel border border-accent/25 bg-surface p-4 shadow-lg;
+  }
+
+  .ds-modal__head {
+    @apply flex items-start justify-between gap-3;
+  }
+
+  .ds-modal__title {
+    @apply text-small font-semibold text-foreground;
+  }
+
+  .ds-modal__close {
+    @apply shrink-0 text-micro text-foreground-muted hover:text-foreground;
+  }
+
+  .ds-modal__actions {
+    @apply flex shrink-0 items-center gap-2 self-start;
+  }
+
+  .ds-modal__action-btn {
+    @apply rounded-panel px-2 py-1.5 text-micro text-foreground-muted transition-colors hover:bg-base/40 hover:text-foreground disabled:opacity-50;
+  }
+
+  .ds-modal__body {
+    @apply mt-3 text-small leading-relaxed text-foreground-muted;
+  }
+
+  .ds-confirm-dialog__actions {
+    @apply mt-4 flex flex-wrap justify-end gap-2;
+  }
+
+  .ds-confirm-dialog__confirm--danger {
+    @apply ds-focus rounded-panel border border-danger/40 bg-danger/15 px-3 py-2 text-small font-medium text-danger transition-colors duration-fast ease-out hover:bg-danger/25 disabled:opacity-50;
+  }
+
+  .ds-daily-card-grid {
+    @apply grid gap-3;
+  }
+
+  .ds-daily-card {
+    @apply flex flex-col justify-between gap-4 rounded-panel border border-border/25 bg-surface-muted/35 p-4 sm:flex-row sm:items-center;
+    border-left-width: 3px;
+  }
+
+  .ds-daily-card__meta {
+    @apply font-mono text-micro text-foreground-muted;
+  }
+
+  .ds-daily-card__xp {
+    @apply font-mono text-small font-semibold text-xp;
+  }
+
+  .ds-quest-item {
+    @apply rounded-panel border border-border/20 bg-surface/60 p-4;
+    border-left-width: 3px;
+  }
+
+  .ds-quest-item--todo {
+    @apply border-l-foreground-muted/40;
+  }
+
+  .ds-quest-item--progress {
+    @apply border-l-accent;
+  }
+
+  .ds-quest-item--done {
+    @apply border-l-success;
+  }
+
+  .ds-quest-item--boss {
+    @apply rounded-boss border-l-info;
+  }
+
+  .ds-xp-track {
+    @apply h-2 overflow-hidden rounded-panel bg-surface-muted;
+  }
+
+  .ds-xp-fill {
+    @apply h-full rounded-panel bg-xp;
+    transition: width var(--motion-slow) var(--ease-out);
+  }
+
+  .ds-log-row {
+    @apply rounded-panel border border-border/20 bg-surface/60 p-4;
+  }
+
+  .ds-log-row--compact {
+    @apply p-2.5;
+  }
+
+  .ds-empty {
+    @apply text-small text-foreground-muted;
+  }
+
+  .ds-error {
+    @apply rounded-panel border border-danger/30 bg-danger/10 p-4 text-small text-danger;
+  }
+
+  .ds-focus {
+    @apply focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent focus-visible:ring-offset-2 focus-visible:ring-offset-base;
+  }
+
+  .ds-theme-toggle {
+    @apply inline-flex items-center justify-center;
+  }
+
+  .ds-skill-tree-board {
+    @apply relative overflow-hidden rounded-panel border border-accent/20 bg-surface p-4;
+    background-image:
+      linear-gradient(rgb(var(--color-accent) / 0.04) 1px, transparent 1px),
+      linear-gradient(90deg, rgb(var(--color-accent) / 0.04) 1px, transparent 1px);
+    background-size: 20px 20px;
+    box-shadow: inset 0 0 0 1px rgb(var(--color-accent) / 0.08);
+  }
+
+  .ds-skill-tree-board__header {
+    @apply mb-4 flex flex-wrap items-end justify-between gap-2 border-b border-border/20 pb-3;
+  }
+
+  .ds-skill-tree-board__progress {
+    @apply font-mono text-small font-semibold text-xp;
+  }
+
+  .ds-skill-tree-board__hint {
+    @apply text-micro text-foreground-muted;
+  }
+
+  .ds-skill-graph {
+    @apply overflow-x-auto;
+    scrollbar-width: none;
+    -ms-overflow-style: none;
+  }
+
+  .ds-skill-graph::-webkit-scrollbar {
+    display: none;
+  }
+
+  .ds-skill-graph__viewport {
+    @apply relative min-w-full;
+  }
+
+  .ds-skill-graph__edges {
+    @apply pointer-events-none absolute inset-0 overflow-visible;
+  }
+
+  .ds-skill-graph__edge {
+    fill: none;
+    stroke: rgb(var(--color-border) / 0.35);
+    stroke-width: 1.5px;
+    stroke-dasharray: 4 6;
+  }
+
+  .ds-skill-graph__edge--active {
+    stroke: rgb(var(--color-accent) / 0.75);
+    stroke-dasharray: none;
+    filter: drop-shadow(0 0 4px rgb(var(--color-accent) / 0.45));
+  }
+
+  .ds-skill-graph-section {
+    @apply space-y-0;
+  }
+
+  .ds-skill-node {
+    @apply absolute flex flex-col items-center justify-center gap-0.5 rounded-boss border-2 px-2 py-2 text-center transition-all duration-medium ease-out;
+    background: linear-gradient(
+      180deg,
+      rgb(var(--color-surface-muted) / 0.55) 0%,
+      rgb(var(--color-surface) / 0.95) 100%
+    );
+    box-shadow:
+      inset 0 1px 0 rgb(var(--color-foreground) / 0.06),
+      0 0 0 1px rgb(var(--color-base) / 0.8);
+  }
+
+  .ds-skill-node--hub {
+    @apply min-h-[4.5rem] border-info/50 text-info;
+    box-shadow:
+      inset 0 0 18px rgb(var(--color-info) / 0.12),
+      0 0 16px rgb(var(--color-info) / 0.18),
+      0 0 0 1px rgb(var(--color-info) / 0.25);
+  }
+
+  .ds-skill-node--learned {
+    @apply border-accent/60 text-accent;
+    box-shadow:
+      inset 0 0 14px rgb(var(--color-accent) / 0.14),
+      0 0 12px rgb(var(--color-accent) / 0.2),
+      0 0 0 1px rgb(var(--color-accent) / 0.3);
+  }
+
+  .ds-skill-node--learned.ds-skill-node--stale {
+    @apply border-warning/60 text-warning;
+    box-shadow:
+      inset 0 0 14px rgb(var(--color-warning) / 0.12),
+      0 0 12px rgb(var(--color-warning) / 0.18),
+      0 0 0 1px rgb(var(--color-warning) / 0.28);
+  }
+
+  .ds-skill-node--available {
+    @apply border-border/30 text-foreground-muted;
+  }
+
+  .ds-skill-node--sealed {
+    @apply opacity-80;
+    border-style: dashed;
+  }
+
+  .ds-skill-node--open {
+    @apply border-solid opacity-100;
+  }
+
+  .ds-skill-node--selected {
+    @apply ring-2 ring-xp ring-offset-2 ring-offset-base;
+  }
+
+  .ds-skill-node--moving {
+    @apply ring-2 ring-info ring-offset-2 ring-offset-base;
+  }
+
+  .ds-skill-node:hover:not(.ds-skill-node--selected) {
+    transform: translateY(-1px);
+    box-shadow:
+      inset 0 0 14px rgb(var(--color-accent) / 0.1),
+      0 0 14px rgb(var(--color-accent) / 0.16),
+      0 0 0 1px rgb(var(--color-accent) / 0.22);
+  }
+
+  .ds-skill-node__gem {
+    @apply font-mono text-body leading-none;
+  }
+
+  .ds-skill-node--hub .ds-skill-node__gem {
+    @apply text-info;
+    text-shadow: 0 0 10px rgb(var(--color-info) / 0.55);
+  }
+
+  .ds-skill-node--learned .ds-skill-node__gem {
+    @apply text-accent;
+    text-shadow: 0 0 10px rgb(var(--color-accent) / 0.55);
+  }
+
+  .ds-skill-node--sealed .ds-skill-node__gem {
+    @apply text-foreground-muted/50;
+  }
+
+  .ds-skill-node__label {
+    @apply line-clamp-2 text-micro font-semibold leading-tight;
+  }
+
+  .ds-skill-node__sealed {
+    @apply font-mono text-micro text-foreground-muted/70;
+  }
+
+  .ds-skill-node__chevron {
+    @apply absolute bottom-1 right-1.5 font-mono text-micro text-foreground-muted;
+  }
+
+  .ds-skill-graph-legend {
+    @apply flex flex-wrap gap-4 text-micro text-foreground-muted;
+  }
+
+  .ds-skill-graph-legend__item {
+    @apply inline-flex items-center gap-2;
+  }
+
+  .ds-skill-graph-legend__swatch {
+    @apply h-2.5 w-2.5 rounded-full;
+  }
+
+  .ds-skill-graph-legend__swatch--learned {
+    @apply bg-accent;
+  }
+
+  .ds-skill-graph-legend__swatch--available {
+    @apply bg-foreground-muted/40;
+  }
+
+  .ds-skill-graph-legend__swatch--sealed {
+    @apply border border-dashed border-foreground-muted/50 bg-transparent;
+  }
+
+  .ds-skill-ranking__list {
+    @apply space-y-0.5;
+  }
+
+  .ds-skill-ranking__row {
+    @apply grid w-full grid-cols-[1.5rem_minmax(0,1fr)_4.5rem_2.5rem] items-center gap-x-2 rounded-panel border border-transparent bg-transparent px-1.5 py-1 text-left transition-colors duration-fast ease-out hover:border-accent/20 hover:bg-surface-muted/30;
+  }
+
+  .ds-skill-ranking__row--selected {
+    @apply border-accent/35 bg-accent/10;
+  }
+
+  .ds-skill-ranking__row--muted {
+    @apply opacity-80;
+  }
+
+  .ds-skill-ranking__divider {
+    @apply my-1.5 border-t border-border/20;
+  }
+
+  .ds-skill-ranking__rank {
+    @apply font-mono text-micro font-semibold text-xp;
+  }
+
+  .ds-skill-ranking__name {
+    @apply truncate text-micro font-medium text-foreground;
+  }
+
+  .ds-skill-ranking__category {
+    @apply truncate text-micro text-foreground-muted;
+  }
+
+  .ds-skill-ranking__xp {
+    @apply text-right font-mono text-micro font-semibold text-xp;
+  }
+
+  .ds-quest-board {
+    @apply grid gap-4;
+  }
+
+  .ds-quest-board__toolbar {
+    @apply sticky top-4 z-10 flex flex-wrap items-center justify-between gap-3 rounded-panel border border-border/20 bg-surface/95 p-2.5 backdrop-blur-sm;
+    box-shadow:
+      0 0 0 1px rgb(var(--color-border) / 0.08),
+      0 8px 24px rgb(var(--color-base) / 0.35);
+  }
+
+  .ds-quest-board__view-switch {
+    @apply inline-flex rounded-panel border border-border/25 bg-base/30 p-0.5;
+  }
+
+  .ds-quest-board__view-btn {
+    @apply rounded-panel px-3 py-1.5 text-micro font-medium text-foreground-muted transition-colors;
+  }
+
+  .ds-quest-board__view-btn--active {
+    @apply bg-accent text-base;
+  }
+
+  .ds-quest-board__filter {
+    @apply flex items-center gap-2 text-micro text-foreground-muted;
+  }
+
+  .ds-quest-kanban {
+    @apply grid gap-4 lg:grid-cols-3;
+  }
+
+  .ds-quest-kanban__column {
+    @apply flex min-h-[18rem] flex-col rounded-panel border border-border/20 bg-surface-muted/25;
+  }
+
+  .ds-quest-kanban__column--muted {
+    @apply opacity-80 lg:col-span-3;
+  }
+
+  .ds-quest-kanban__column-head {
+    @apply flex items-center justify-between gap-2 border-b border-border/20 px-3 py-2.5;
+  }
+
+  .ds-quest-kanban__column-title {
+    @apply text-small font-semibold text-foreground;
+  }
+
+  .ds-quest-kanban__column-count {
+    @apply rounded-full bg-base/50 px-2 py-0.5 font-mono text-micro text-foreground-muted;
+  }
+
+  .ds-quest-kanban__column-body {
+    @apply flex flex-1 flex-col gap-3 p-3;
+  }
+
+  .ds-quest-kanban__empty {
+    @apply rounded-panel border border-dashed border-border/25 px-3 py-6 text-center text-micro text-foreground-muted;
+  }
+
+  .ds-quest-board-card {
+    @apply flex flex-col gap-3;
+  }
+
+  .ds-quest-board-card--fixed {
+    @apply h-full min-h-[13.5rem] cursor-pointer transition-colors duration-fast ease-out hover:border-accent/35;
+  }
+
+  .ds-quest-board-card--compact {
+    @apply p-3;
+  }
+
+  .ds-quest-board-card__head {
+    @apply grid gap-1;
+  }
+
+  .ds-quest-board-card__title {
+    @apply text-small font-semibold leading-snug text-foreground;
+  }
+
+  .ds-quest-board-card__meta {
+    @apply text-micro text-foreground-muted;
+  }
+
+  .ds-quest-board-card__missions {
+    @apply rounded-panel border border-border/15 bg-base/20 p-2;
+  }
+
+  .ds-quest-board-card__missions--preview {
+    @apply flex min-h-0 flex-1 flex-col;
+  }
+
+  .ds-quest-board-card__missions-label {
+    @apply mb-1.5 shrink-0 font-mono text-micro text-foreground-muted;
+  }
+
+  .ds-quest-board-card__mission-list {
+    @apply grid gap-1;
+  }
+
+  .ds-quest-board-card__mission-list--preview {
+    @apply min-h-0 flex-1 overflow-hidden;
+  }
+
+  .ds-quest-board-card__mission {
+    @apply flex items-start gap-2 text-micro text-foreground;
+  }
+
+  .ds-quest-board-card__mission--preview {
+    @apply pointer-events-none;
+  }
+
+  .ds-quest-board-card__mission--preview input {
+    @apply mt-0.5 shrink-0 accent-accent;
+  }
+
+  .ds-quest-board-card__mission-preview-text {
+    @apply line-clamp-1 min-w-0 flex-1 leading-snug;
+  }
+
+  .ds-quest-board-card__actions {
+    @apply mt-auto grid shrink-0 gap-2;
+  }
+
+  .ds-quest-detail-modal {
+    @apply max-w-lg;
+  }
+
+  .ds-quest-detail-modal__meta {
+    @apply mt-1 text-micro text-foreground-muted;
+  }
+
+  .ds-quest-detail-modal__description {
+    @apply mt-3 text-small leading-relaxed text-foreground-muted;
+  }
+
+  .ds-quest-detail-modal__missions {
+    @apply mt-4;
+  }
+
+  .ds-quest-detail-modal__actions {
+    @apply mt-4 grid gap-2;
+  }
+
+  .ds-quest-board-card__ghost-btn {
+    @apply rounded-panel px-2 py-1.5 text-micro text-foreground-muted transition-colors hover:bg-base/40 hover:text-foreground;
+  }
+
+  .ds-quest-board-card__evidence {
+    @apply grid gap-2 border-t border-border/20 pt-3;
+  }
+
+  .ds-quest-board-card__input {
+    @apply w-full rounded-panel border border-border/25 bg-surface px-2.5 py-1.5 text-micro text-foreground;
+  }
+
+  .ds-quest-roadmap {
+    @apply grid gap-3 rounded-panel border border-border/20 bg-surface-muted/20;
+  }
+
+  .ds-quest-roadmap__toolbar {
+    @apply flex flex-wrap items-center justify-between gap-3 border-b border-border/20 px-3 py-2.5;
+  }
+
+  .ds-quest-roadmap__toolbar-group {
+    @apply flex items-center gap-1.5;
+  }
+
+  .ds-quest-roadmap__tool-btn {
+    @apply rounded-panel border border-border/25 bg-surface px-2.5 py-1 text-micro text-foreground-muted transition-colors hover:border-accent/35 hover:text-foreground;
+  }
+
+  .ds-quest-roadmap__hint {
+    @apply text-micro text-foreground-muted;
+  }
+
+  .ds-quest-roadmap__scroll {
+    @apply overflow-x-auto;
+  }
+
+  .ds-quest-roadmap__layout {
+    @apply flex min-w-max;
+  }
+
+  .ds-quest-roadmap__sidebar {
+    @apply sticky left-0 z-20 w-56 shrink-0 border-r border-border/20 bg-surface/95 backdrop-blur-sm;
+  }
+
+  .ds-quest-roadmap__sidebar-head {
+    @apply h-[4.5rem] border-b border-border/20;
+  }
+
+  .ds-quest-roadmap__sidebar-row {
+    @apply flex h-11 items-center gap-2 border-b border-border/15 px-3;
+  }
+
+  .ds-quest-roadmap__status-dot {
+    @apply h-2 w-2 shrink-0 rounded-full;
+  }
+
+  .ds-quest-roadmap__status-dot--todo {
+    @apply bg-foreground-muted/50;
+  }
+
+  .ds-quest-roadmap__status-dot--progress {
+    @apply bg-accent;
+  }
+
+  .ds-quest-roadmap__status-dot--done {
+    @apply bg-success;
+  }
+
+  .ds-quest-roadmap__status-dot--cancelled {
+    @apply bg-foreground-muted/30;
+  }
+
+  .ds-quest-roadmap__status-dot--boss {
+    @apply bg-info;
+  }
+
+  .ds-quest-roadmap__row-title {
+    @apply truncate text-micro font-medium text-foreground;
+  }
+
+  .ds-quest-roadmap__row-meta {
+    @apply truncate font-mono text-micro text-foreground-muted;
+  }
+
+  .ds-quest-roadmap__timeline {
+    @apply min-w-0 flex-1;
+  }
+
+  .ds-quest-roadmap__months {
+    @apply grid h-8 border-b border-border/20;
+  }
+
+  .ds-quest-roadmap__month-label {
+    @apply flex items-center border-r border-border/15 px-2 text-micro font-medium capitalize text-foreground-muted;
+  }
+
+  .ds-quest-roadmap__days {
+    @apply grid h-8 border-b border-border/20;
+  }
+
+  .ds-quest-roadmap__day {
+    @apply flex items-center justify-center border-r border-border/15 font-mono text-micro text-foreground-muted;
+  }
+
+  .ds-quest-roadmap__day--today {
+    @apply bg-danger/10 font-semibold text-danger;
+  }
+
+  .ds-quest-roadmap__grid {
+    @apply relative;
+  }
+
+  .ds-quest-roadmap__today-line {
+    @apply pointer-events-none absolute bottom-0 top-0 z-10 w-px bg-danger;
+  }
+
+  .ds-quest-roadmap__today-line::before {
+    content: "";
+    @apply absolute -left-[3px] -top-[3px] h-1.5 w-1.5 rounded-full bg-danger;
+  }
+
+  .ds-quest-roadmap__grid-row {
+    @apply relative h-11 border-b border-border/15;
+  }
+
+  .ds-quest-roadmap__grid-cells {
+    @apply grid h-full;
+  }
+
+  .ds-quest-roadmap__cell {
+    @apply border-r border-border/10;
+  }
+
+  .ds-quest-roadmap__bar {
+    @apply absolute top-1/2 z-[1] flex h-6 -translate-y-1/2 items-center overflow-hidden rounded-panel px-2;
+  }
+
+  .ds-quest-roadmap__bar-label {
+    @apply truncate text-micro font-medium text-base;
+  }
+
+  .ds-quest-roadmap__bar--todo {
+    @apply bg-foreground-muted/35;
+  }
+
+  .ds-quest-roadmap__bar--progress {
+    @apply bg-accent/85;
+  }
+
+  .ds-quest-roadmap__bar--done {
+    @apply bg-success/80;
+  }
+
+  .ds-quest-roadmap__bar--cancelled {
+    @apply bg-foreground-muted/25;
+  }
+
+  .ds-quest-roadmap__bar--boss {
+    @apply bg-info/85;
+  }
+
+  .ds-quest-cards {
+    @apply grid grid-cols-1 items-stretch gap-4 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5;
+  }
+
+  .ds-quest-board-empty {
+    @apply grid gap-4 rounded-panel border border-dashed border-border/30 px-6 py-10 text-center text-small text-foreground-muted;
+  }
+
+  .ds-quest-board-add {
+    @apply relative;
+  }
+
+  .ds-quest-board-add__panel {
+    @apply absolute right-0 top-full z-30 mt-2 w-[min(24rem,calc(100vw-2rem))] rounded-panel border border-border/25 bg-surface p-3 shadow-lg;
+  }
+
+  .ds-quest-board-add__search {
+    @apply mb-3 block;
+  }
+
+  .ds-quest-board-add__search-input {
+    @apply w-full rounded-panel border border-border/25 bg-surface px-3 py-2 text-small text-foreground placeholder:text-foreground-muted;
+  }
+
+  .ds-quest-board-add__filters {
+    @apply mb-3 grid gap-2 sm:grid-cols-3;
+  }
+
+  .ds-quest-board-add__filter {
+    @apply grid gap-1;
+  }
+
+  .ds-quest-board-add__filter-label {
+    @apply text-micro text-foreground-muted;
+  }
+
+  .ds-quest-board-add__filter-input {
+    @apply w-full rounded-panel border border-border/25 bg-surface px-2 py-1.5 text-micro text-foreground;
+  }
+
+  .ds-quest-board-add__list {
+    @apply grid max-h-72 gap-2 overflow-y-auto;
+  }
+
+  .ds-quest-board-add__item {
+    @apply flex items-center justify-between gap-3 rounded-panel border border-border/20 bg-surface-muted/30 p-2.5;
+  }
+
+  .ds-quest-board-add__title {
+    @apply truncate text-small font-medium text-foreground;
+  }
+
+  .ds-quest-board-add__meta {
+    @apply truncate text-micro text-foreground-muted;
+  }
+
+  .ds-quest-board-add__btn {
+    @apply shrink-0 rounded-panel border border-accent/30 px-2.5 py-1 text-micro font-medium text-accent transition-colors hover:bg-accent/10;
+  }
+
+  .ds-quest-board-card__remove {
+    @apply flex h-6 w-6 shrink-0 items-center justify-center rounded-full text-micro text-foreground-muted transition-colors hover:bg-base/50 hover:text-foreground;
+  }
+
+  .ds-user-menu {
+    @apply relative flex items-center gap-2;
+  }
+
+  .ds-user-menu__identity {
+    @apply hidden max-w-[10rem] truncate font-mono text-small text-foreground lg:block;
+  }
+
+  .ds-user-menu__role {
+    @apply text-foreground-muted;
+  }
+
+  .ds-user-menu__avatar-trigger {
+    @apply inline-flex shrink-0 rounded-full transition-opacity hover:opacity-90;
+  }
+
+  .ds-user-avatar {
+    @apply inline-flex shrink-0 items-center justify-center overflow-hidden rounded-full border-2 border-accent/40 bg-surface-muted font-mono font-semibold text-accent;
+  }
+
+  .ds-user-avatar--image {
+    @apply object-contain object-center;
+  }
+
+  .ds-user-avatar--initials {
+    @apply bg-accent/15;
+  }
+
+  .ds-user-menu__panel-heading {
+    @apply border-b border-border/20 px-3 py-2 text-small font-medium text-foreground;
+  }
+
+  .ds-user-menu__panel {
+    @apply absolute right-0 top-[calc(100%+0.5rem)] z-50 min-w-[12rem] rounded-panel border border-border/20 bg-surface p-1 shadow-lg;
+  }
+
+  .ds-user-menu__error {
+    @apply mb-1 rounded-panel border border-danger/30 bg-danger/10 px-2 py-1 text-micro text-danger;
+  }
+
+  .ds-user-menu__item {
+    @apply flex w-full rounded-panel px-3 py-2 text-left text-small text-foreground transition-colors hover:bg-surface-muted;
+  }
+
+  .ds-user-menu__item--danger {
+    @apply text-danger hover:bg-danger/10;
+  }
+
+  .login-page {
+    @apply relative min-h-screen overflow-hidden bg-base;
+  }
+
+  .login-page__background {
+    @apply absolute inset-0 h-full w-full object-cover;
+  }
+
+  .login-page__overlay {
+    @apply absolute inset-0 bg-base/70 backdrop-blur-[1px];
+  }
+
+  .login-page__content {
+    @apply relative z-10 mx-auto flex min-h-screen max-w-6xl flex-col px-4 py-6 sm:px-6;
+  }
+
+  .login-page__header {
+    @apply mb-8 flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between;
+  }
+
+  .login-page__panel {
+    @apply mx-auto w-full max-w-md;
+  }
+
+  .login-page__subtitle {
+    @apply mb-6 text-small text-foreground-muted;
+  }
+
+  .login-page__form {
+    @apply grid gap-4;
+  }
+
+  .login-page__field {
+    @apply grid gap-1;
+  }
+
+  .login-page__label {
+    @apply font-mono text-micro uppercase tracking-wide text-foreground-muted;
+  }
+
+  .login-page__input {
+    @apply w-full rounded-panel border border-border/25 bg-surface px-3 py-2 text-small text-foreground;
+  }
+
+  .login-page__error {
+    @apply rounded-panel border border-danger/30 bg-danger/10 px-3 py-2 text-small text-danger;
+  }
+
+  .login-page__submit {
+    @apply ds-focus rounded-panel bg-accent px-4 py-2 text-small font-medium text-base transition-colors hover:bg-primary-hover;
+  }
+
+  .login-page__links {
+    @apply flex flex-wrap justify-between gap-2;
+  }
+
+  .login-page__link {
+    @apply ds-focus text-small text-accent underline-offset-2 hover:underline;
+  }
+
+  .login-page__success {
+    @apply rounded-panel border border-primary-dark/30 bg-primary-dark/10 px-3 py-2 text-small text-primary-dark;
+  }
+
+  .users-table {
+    @apply w-full border-collapse text-left text-small;
+  }
+
+  .users-table th,
+  .users-table td {
+    @apply border-b border-border/20 px-3 py-2;
+  }
+
+  .users-table th {
+    @apply font-mono text-micro uppercase tracking-wide text-foreground-muted;
+  }
+
+  .users-form {
+    @apply grid gap-4 sm:grid-cols-2;
+  }
+
+  .users-form__field {
+    @apply grid gap-1;
+  }
+
+  .users-form__field input,
+  .users-form__field select {
+    @apply w-full rounded-panel border border-border/25 bg-surface px-3 py-2 text-small text-foreground;
+  }
+
+  .users-form__submit {
+    @apply ds-focus rounded-panel bg-accent px-4 py-2 text-small font-medium text-base transition-colors hover:bg-primary-hover sm:col-span-2 sm:w-fit;
+  }
+}
