@@ -26,6 +26,8 @@ import {
 
 import QuestMissionFields from "./QuestMissionFields";
 
+import { LinkifiedText } from "../ui/LinkifiedText";
+
 type QuestDetailModalProps = {
   quest: QuestResponse | null;
   open: boolean;
@@ -338,7 +340,7 @@ export default function QuestDetailModal({
                         }
                       />
                       <span className={mission.isCompleted ? "line-through opacity-70" : ""}>
-                        {mission.title}
+                        <LinkifiedText text={mission.title} />
                       </span>
                     </label>
                   </li>

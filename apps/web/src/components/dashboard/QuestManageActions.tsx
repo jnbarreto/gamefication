@@ -1,6 +1,7 @@
 import { useTranslation } from "react-i18next";
 
 import { Badge } from "@/components/design";
+import { LinkifiedText } from "../ui/LinkifiedText";
 import type { QuestResponse } from "@/lib/api/types";
 import {
   allQuestMissionsCompleted,
@@ -53,7 +54,7 @@ export default function QuestMissionList({
                 }
               />
               <span className={mission.isCompleted ? "line-through opacity-70" : ""}>
-                {mission.title}
+                <LinkifiedText text={mission.title} />
               </span>
             </label>
           </li>

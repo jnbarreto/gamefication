@@ -25,6 +25,8 @@ type MissionPreviewRowProps = {
   isCompleted: boolean;
 };
 
+import { LinkifiedText } from "../ui/LinkifiedText";
+
 function MissionPreviewRow({ title, isCompleted }: MissionPreviewRowProps) {
   return (
     <label className="ds-quest-board-card__mission ds-quest-board-card__mission--preview">
@@ -37,10 +39,12 @@ function MissionPreviewRow({ title, isCompleted }: MissionPreviewRowProps) {
         aria-hidden="true"
       />
       <span
-        className={`ds-quest-board-card__mission-preview-text ${isCompleted ? "line-through opacity-70" : ""}`}
+        className="ds-quest-board-card__mission-preview-text"
         title={title}
       >
-        {title}
+        <span className={isCompleted ? "line-through opacity-70" : ""}>
+          <LinkifiedText text={title} />
+        </span>
       </span>
     </label>
   );
