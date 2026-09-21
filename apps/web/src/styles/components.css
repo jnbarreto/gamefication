@@ -1040,7 +1040,7 @@
   }
 
   .ds-quest-board-card--fixed {
-    @apply h-full min-h-[13.5rem] cursor-pointer transition-colors duration-fast ease-out hover:border-accent/35;
+    @apply h-[18.5rem] max-h-[18.5rem] cursor-pointer transition-colors duration-fast ease-out hover:border-accent/35;
   }
 
   .ds-quest-board-card--compact {
@@ -1048,27 +1048,35 @@
   }
 
   .ds-quest-board-card__head {
-    @apply grid gap-1;
+    @apply flex h-[4.25rem] shrink-0 flex-col justify-between;
   }
 
   .ds-quest-board-card__title {
-    @apply text-small font-semibold leading-snug text-foreground;
+    @apply line-clamp-2 text-small font-semibold leading-snug text-foreground;
   }
 
   .ds-quest-board-card__meta {
-    @apply text-micro text-foreground-muted;
+    @apply truncate text-micro text-foreground-muted;
   }
 
   .ds-quest-board-card__missions {
-    @apply rounded-panel border border-border/15 bg-base/20 p-2;
+    @apply flex h-[8.25rem] shrink-0 flex-col rounded-panel border border-border/15 bg-base/20 p-2.5;
   }
 
   .ds-quest-board-card__missions--preview {
-    @apply flex min-h-0 flex-1 flex-col;
+    @apply flex min-h-0 flex-col;
+  }
+
+  .ds-quest-board-card__missions--empty {
+    @apply items-center justify-center border-dashed border-border/15 bg-base/10 text-center;
+  }
+
+  .ds-quest-board-card__missions-empty-text {
+    @apply select-none text-micro text-foreground-muted/50;
   }
 
   .ds-quest-board-card__missions-label {
-    @apply mb-1.5 shrink-0 font-mono text-micro text-foreground-muted;
+    @apply truncate font-mono text-micro text-foreground-muted;
   }
 
   .ds-quest-board-card__mission-list {
@@ -1076,7 +1084,26 @@
   }
 
   .ds-quest-board-card__mission-list--preview {
-    @apply min-h-0 flex-1 overflow-hidden;
+    @apply min-h-0 flex-1 overflow-y-auto pr-1;
+    scrollbar-width: thin;
+    scrollbar-color: rgba(255, 255, 255, 0.18) transparent;
+  }
+
+  .ds-quest-board-card__mission-list--preview::-webkit-scrollbar {
+    width: 4px;
+  }
+
+  .ds-quest-board-card__mission-list--preview::-webkit-scrollbar-track {
+    background: transparent;
+  }
+
+  .ds-quest-board-card__mission-list--preview::-webkit-scrollbar-thumb {
+    background: rgba(255, 255, 255, 0.18);
+    border-radius: 9999px;
+  }
+
+  .ds-quest-board-card__mission-list--preview::-webkit-scrollbar-thumb:hover {
+    background: rgba(255, 255, 255, 0.3);
   }
 
   .ds-quest-board-card__mission {
@@ -1096,7 +1123,7 @@
   }
 
   .ds-quest-board-card__actions {
-    @apply mt-auto grid shrink-0 gap-2;
+    @apply mt-auto flex h-9 shrink-0 items-center;
   }
 
   .ds-quest-detail-modal {

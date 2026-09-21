@@ -203,6 +203,7 @@ const en = {
     removeMission: "Remove mission",
     missionsProgress: "Missions {{completed}}/{{total}}",
     completeMissionsHint: "Complete all missions before finishing the quest.",
+    noMissions: "No missions",
   },
   questBoard: {
     title: "Quest board",

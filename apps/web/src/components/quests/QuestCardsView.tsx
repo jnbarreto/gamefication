@@ -9,6 +9,7 @@ import QuestDetailModal from "./QuestDetailModal";
 
 type QuestCardsViewProps = {
   quests: QuestResponse[];
+  maxCards?: number;
   actionQuestId: string | null;
   startingQuestId?: string | null;
   togglingMissionId: string | null;
@@ -29,6 +30,7 @@ type QuestCardsViewProps = {
 
 export default function QuestCardsView({
   quests,
+  maxCards,
   actionQuestId,
   startingQuestId = null,
   togglingMissionId,
@@ -49,16 +51,17 @@ export default function QuestCardsView({
   const { t } = useTranslation();
   const [detailQuestId, setDetailQuestId] = useState<string | null>(null);
   const [detailEditMode, setDetailEditMode] = useState(false);
-  const detailQuest = quests.find((quest) => quest.id === detailQuestId) ?? null;
+  const visibleQuests = typeof maxCards === "number" ? quests.slice(0, maxCards) : quests;
+  const detailQuest = visibleQuests.find((quest) => quest.id === detailQuestId) ?? null;
 
-  if (quests.length === 0) {
+  if (visibleQuests.length === 0) {
     return <p className="ds-empty">{t("questBoard.cardsEmpty")}</p>;
   }
 
   return (
     <>
       <div className="ds-quest-cards">
-        {quests.map((quest) => (
+        {visibleQuests.map((quest) => (
           <QuestBoardCard
             key={quest.id}
             quest={quest}

@@ -4,10 +4,7 @@ import { useTranslation } from "react-i18next";
 import { Badge, questItemClass } from "@/components/design";
 import type { QuestResponse } from "@/lib/api/types";
 import { completedMissionCount } from "@/lib/quests/questMissionProgress";
-import {
-  questReopenPillButtonClass,
-  questStatusPillClass,
-} from "@/lib/quests/questStatusPill";
+import { questReopenPillButtonClass } from "@/lib/quests/questStatusPill";
 
 type QuestBoardCardProps = {
   quest: QuestResponse;
@@ -29,7 +26,7 @@ import { LinkifiedText } from "../ui/LinkifiedText";
 
 function MissionPreviewRow({ title, isCompleted }: MissionPreviewRowProps) {
   return (
-    <label className="ds-quest-board-card__mission ds-quest-board-card__mission--preview">
+    <div className="ds-quest-board-card__mission ds-quest-board-card__mission--preview">
       <input
         type="checkbox"
         checked={isCompleted}
@@ -46,7 +43,7 @@ function MissionPreviewRow({ title, isCompleted }: MissionPreviewRowProps) {
           <LinkifiedText text={title} />
         </span>
       </span>
-    </label>
+    </div>
   );
 }
 
@@ -88,9 +85,11 @@ export default function QuestBoardCard({
     >
       <header className="ds-quest-board-card__head">
         <div className="flex items-start justify-between gap-2">
-          <h4 className="ds-quest-board-card__title line-clamp-2">{quest.title}</h4>
+          <h4 className="ds-quest-board-card__title line-clamp-2" title={quest.title}>
+            {quest.title}
+          </h4>
           <div
-            className="flex shrink-0 flex-col items-end gap-2"
+            className="flex shrink-0 flex-col items-end gap-1"
             onClick={(event) => event.stopPropagation()}
           >
             {onRemoveFromBoard && (
@@ -104,24 +103,17 @@ export default function QuestBoardCard({
               </button>
             )}
 
-            {(quest.status === "CANCELLED" || quest.status === "COMPLETED") && (
-              <>
-                <span className={questStatusPillClass(quest.status)}>
-                  {t(`enums.questStatus.${quest.status}`, { defaultValue: quest.status })}
-                </span>
-                {onReopen && (
-                  <button
-                    type="button"
-                    className={questReopenPillButtonClass}
-                    disabled={isBusy}
-                    onClick={() => onReopen(quest.id)}
-                  >
-                    {isBusy
-                      ? t("quests.reopening", { defaultValue: "Reopening…" })
-                      : t("quests.reopen", { defaultValue: "Reopen" })}
-                  </button>
-                )}
-              </>
+            {(quest.status === "CANCELLED" || quest.status === "COMPLETED") && onReopen && (
+              <button
+                type="button"
+                className={questReopenPillButtonClass}
+                disabled={isBusy}
+                onClick={() => onReopen(quest.id)}
+              >
+                {isBusy
+                  ? t("quests.reopening", { defaultValue: "Reopening…" })
+                  : t("quests.reopen", { defaultValue: "Reopen" })}
+              </button>
             )}
           </div>
         </div>
@@ -131,14 +123,21 @@ export default function QuestBoardCard({
         </p>
       </header>
 
-      {missionTotal > 0 && (
+      {missionTotal > 0 ? (
         <div className="ds-quest-board-card__missions ds-quest-board-card__missions--preview">
-          <p className="ds-quest-board-card__missions-label">
-            {t("quests.missionsProgress", {
-              completed: missionDone,
-              total: missionTotal,
-            })}
-          </p>
+          <div className="mb-1.5 flex shrink-0 items-center justify-between gap-1">
+            <p className="ds-quest-board-card__missions-label mb-0">
+              {t("quests.missionsProgress", {
+                completed: missionDone,
+                total: missionTotal,
+              })}
+            </p>
+            {missionTotal > 3 && (
+              <span className="text-micro font-mono text-foreground-muted/60 shrink-0">
+                +{missionTotal - 3}
+              </span>
+            )}
+          </div>
           <ul className="ds-quest-board-card__mission-list ds-quest-board-card__mission-list--preview">
             {quest.missions.map((mission) => (
               <li key={mission.id}>
@@ -150,9 +149,14 @@ export default function QuestBoardCard({
             ))}
           </ul>
         </div>
+      ) : (
+        <div className="ds-quest-board-card__missions ds-quest-board-card__missions--empty">
+          <p className="ds-quest-board-card__missions-empty-text">
+            {t("quests.noMissions", { defaultValue: "Sem missões" })}
+          </p>
+        </div>
       )}
 
-      {(quest.status === "TODO" || quest.status === "IN_PROGRESS") && (
       <footer
         className="ds-quest-board-card__actions"
         onClick={(event) => event.stopPropagation()}
@@ -160,7 +164,7 @@ export default function QuestBoardCard({
         {quest.status === "TODO" && (
           <button
             type="button"
-            className="ds-btn-primary-compact w-full"
+            className="ds-btn-primary-compact w-full h-full flex items-center justify-center"
             disabled={isBusy || isStarting}
             onClick={() => onStart(quest.id)}
           >
@@ -169,12 +173,32 @@ export default function QuestBoardCard({
         )}
 
         {quest.status === "IN_PROGRESS" && (
-          <Badge variant="accent">
+          <Badge
+            variant="accent"
+            className="w-full h-full flex items-center justify-center py-0"
+          >
+            {t(`enums.questStatus.${quest.status}`, { defaultValue: quest.status })}
+          </Badge>
+        )}
+
+        {quest.status === "COMPLETED" && (
+          <Badge
+            variant="success"
+            className="w-full h-full flex items-center justify-center py-0"
+          >
+            {t(`enums.questStatus.${quest.status}`, { defaultValue: quest.status })}
+          </Badge>
+        )}
+
+        {quest.status === "CANCELLED" && (
+          <Badge
+            variant="muted"
+            className="w-full h-full flex items-center justify-center py-0"
+          >
             {t(`enums.questStatus.${quest.status}`, { defaultValue: quest.status })}
           </Badge>
         )}
       </footer>
-      )}
     </article>
   );
 }

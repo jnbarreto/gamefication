@@ -203,6 +203,7 @@ const pt = {
     removeMission: "Remover missão",
     missionsProgress: "Missões {{completed}}/{{total}}",
     completeMissionsHint: "Conclua todas as missões para finalizar a quest.",
+    noMissions: "Sem missões",
   },
   questBoard: {
     title: "Quadro de quests",

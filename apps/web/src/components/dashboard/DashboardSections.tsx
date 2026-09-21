@@ -149,6 +149,8 @@ type TodaysDailiesPanelProps = QuestCardHandlers & {
   quests: QuestResponse[];
 };
 
+const MAX_DASHBOARD_QUESTS = 5;
+
 function TodaysDailiesPanel({
   quests,
   onStartQuest,
@@ -170,6 +172,7 @@ function TodaysDailiesPanel({
 }: TodaysDailiesPanelProps) {
   const { t } = useTranslation();
   const sortedQuests = sortQuestsByDashboardPriority(quests);
+  const displayedQuests = sortedQuests.slice(0, MAX_DASHBOARD_QUESTS);
 
   return (
     <Panel title={t("dashboard.todaysDailies")}>
@@ -179,11 +182,11 @@ function TodaysDailiesPanel({
         </div>
       )}
 
-      {quests.length === 0 ? (
+      {displayedQuests.length === 0 ? (
         <EmptyState message={t("dashboard.noDailies")} />
       ) : (
         <QuestCardsView
-          quests={sortedQuests}
+          quests={displayedQuests}
           actionQuestId={actionQuestId}
           startingQuestId={startingQuestId}
           togglingMissionId={togglingMissionId}
