@@ -85,9 +85,10 @@ function EmptyState({ message }: { message: string }) {
 
 type StreakSidebarProps = {
   streak: StreakResponse;
+  calendarDay: string;
 };
 
-function StreakSidebar({ streak }: StreakSidebarProps) {
+function StreakSidebar({ streak, calendarDay }: StreakSidebarProps) {
   const { t } = useTranslation();
 
   return (
@@ -113,6 +114,7 @@ function StreakSidebar({ streak }: StreakSidebarProps) {
         <StreakHeatmap
           heatmap={streak.activityHeatmap}
           activeDay={streak.lastActivityDay}
+          todayDay={calendarDay}
         />
       )}
     </aside>
@@ -317,7 +319,7 @@ function DashboardContent({
 
       <div className="ds-dashboard-hero-row">
         <CharacterSheetHero character={character} calendarDay={calendarDay} />
-        <StreakSidebar streak={streak} />
+        <StreakSidebar streak={streak} calendarDay={calendarDay} />
       </div>
 
       <TodaysDailiesPanel

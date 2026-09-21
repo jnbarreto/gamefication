@@ -227,7 +227,7 @@
   }
 
   .ds-streak-month-heatmap__pill {
-    @apply block h-2 w-full rounded-full border border-transparent;
+    @apply block h-2 w-full rounded-full transition-colors duration-fast;
   }
 
   .ds-streak-month-heatmap__pill--level-0 {
