@@ -240,6 +240,22 @@ const en = {
     cannotDeleteLastBoard: "Cannot delete the only board.",
     defaultBoardName: "Main Board",
   },
+  questTimer: {
+    modalTitle: "Start Quest with Timer?",
+    modalQuestion: "Would you like to track time for this quest?",
+    modalHint:
+      "The timer tracks how long you take to finish the quest and measures each mission's duration. It is completely optional.",
+    startWithTimer: "Yes, start with timer",
+    startWithoutTimer: "Start without timer",
+    timerLabel: "Elapsed quest time",
+    running: "Running",
+    paused: "Paused",
+    stopped: "Stopped",
+    pause: "Pause",
+    resume: "Resume",
+    start: "Start timer",
+    missionDurationTitle: "Time taken on this mission",
+  },
   skills: {
     title: "Skills",
     subtitle: "{{categories}} categories · {{skills}} skills tracked",

@@ -8,6 +8,7 @@ import type QuestRepository from "../../repository/QuestRepository.js";
 
 export type UpdateQuestMissionInput = {
   completed: boolean;
+  durationSeconds?: number | null;
 };
 
 export default class UpdateQuestMission {
@@ -45,7 +46,11 @@ export default class UpdateQuestMission {
       throw new NotFoundError("Mission not found");
     }
 
-    mission.setCompleted(input.completed);
+    mission.setCompleted(
+      input.completed,
+      new Date(),
+      input.completed ? (input.durationSeconds ?? null) : null,
+    );
     await this.missionRepository.update(mission);
 
     return mission;

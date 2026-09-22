@@ -25,8 +25,14 @@ import {
 } from "@/lib/quests/questStatusPill";
 
 import QuestMissionFields from "./QuestMissionFields";
-
 import { LinkifiedText } from "../ui/LinkifiedText";
+import { updateQuestTimer } from "@/lib/api/quests";
+import type { QuestMissionResponse } from "@/lib/api/types";
+import {
+  computeLiveQuestSeconds,
+  formatDigitalTimer,
+  formatDuration,
+} from "@/lib/quests/questTimer";
 
 type QuestDetailModalProps = {
   quest: QuestResponse | null;
@@ -46,8 +52,18 @@ type QuestDetailModalProps = {
   onCancel: (questId: string) => void;
   onReopen: (questId: string) => void;
   onSave: (questId: string, input: UpdateQuestRequest) => void;
-  onToggleMission: (questId: string, missionId: string, completed: boolean) => void;
+  onToggleMission: (
+    questId: string,
+    missionId: string,
+    completed: boolean,
+    durationSeconds?: number | null,
+  ) => void;
   onToggleEvidence: (questId: string | null) => void;
+  onUpdateTimer?: (
+    questId: string,
+    action: "START" | "PAUSE" | "SYNC",
+    timerSeconds?: number,
+  ) => Promise<void>;
 };
 
 export default function QuestDetailModal({
@@ -70,6 +86,7 @@ export default function QuestDetailModal({
   onSave,
   onToggleMission,
   onToggleEvidence,
+  onUpdateTimer,
 }: QuestDetailModalProps) {
   const { t } = useTranslation();
   const [isEditing, setIsEditing] = useState(false);
@@ -80,6 +97,64 @@ export default function QuestDetailModal({
   const [editSkillId, setEditSkillId] = useState("");
   const [editMissions, setEditMissions] = useState<QuestMissionDraft[]>([{ title: "" }]);
   const isSaving = quest !== null && savingQuestId === quest.id;
+
+  const [liveSeconds, setLiveSeconds] = useState(0);
+  const [isUpdatingTimer, setIsUpdatingTimer] = useState(false);
+
+  useEffect(() => {
+    if (!open || !quest) {
+      setLiveSeconds(0);
+      return;
+    }
+
+    setLiveSeconds(computeLiveQuestSeconds(quest));
+
+    if (!quest.timerRunning) return;
+
+    const interval = setInterval(() => {
+      setLiveSeconds(computeLiveQuestSeconds(quest));
+    }, 1000);
+
+    return () => clearInterval(interval);
+  }, [open, quest]);
+
+  async function handleToggleTimer() {
+    if (!quest) return;
+    setIsUpdatingTimer(true);
+    try {
+      const action = quest.timerRunning ? "PAUSE" : "START";
+      if (onUpdateTimer) {
+        await onUpdateTimer(quest.id, action);
+      } else {
+        await updateQuestTimer(quest.id, action);
+      }
+    } catch {
+      // handled by caller or state
+    } finally {
+      setIsUpdatingTimer(false);
+    }
+  }
+
+  function handleMissionToggle(mission: QuestMissionResponse, checked: boolean) {
+    if (!quest) return;
+
+    if (!checked) {
+      onToggleMission(quest.id, mission.id, false, null);
+      return;
+    }
+
+    const currentTimer = liveSeconds;
+    if (currentTimer > 0) {
+      const otherMissionsDuration = quest.missions
+        .filter((m) => m.isCompleted && m.id !== mission.id)
+        .reduce((sum, m) => sum + (m.durationSeconds ?? 0), 0);
+
+      const delta = Math.max(0, currentTimer - otherMissionsDuration);
+      onToggleMission(quest.id, mission.id, true, delta);
+    } else {
+      onToggleMission(quest.id, mission.id, true, null);
+    }
+  }
 
   useEffect(() => {
     if (!open || !quest) {
@@ -306,6 +381,73 @@ export default function QuestDetailModal({
           <p className="ds-quest-detail-modal__description">{activeQuest.description}</p>
         )}
 
+        {!isEditing &&
+          (activeQuest.status === "IN_PROGRESS" ||
+            activeQuest.timerRunning ||
+            liveSeconds > 0) && (
+            <div className="my-4 flex items-center justify-between rounded-lg border border-border/40 bg-surface-muted/40 p-3.5 backdrop-blur-sm">
+              <div className="flex items-center gap-3">
+                <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-accent/15 text-lg text-accent">
+                  ⏱️
+                </div>
+                <div>
+                  <div className="flex items-center gap-2">
+                    <span className="font-mono text-2xl font-bold tracking-wider text-foreground">
+                      {formatDigitalTimer(liveSeconds)}
+                    </span>
+                    {activeQuest.timerRunning ? (
+                      <span className="inline-flex items-center gap-1 rounded-full bg-emerald-500/20 px-2 py-0.5 text-micro font-medium text-emerald-400 animate-pulse">
+                        <span className="h-1.5 w-1.5 rounded-full bg-emerald-400" />
+                        {t("questTimer.running", { defaultValue: "Em andamento" })}
+                      </span>
+                    ) : liveSeconds > 0 ? (
+                      <span className="inline-flex items-center gap-1 rounded-full bg-amber-500/20 px-2 py-0.5 text-micro font-medium text-amber-400">
+                        <span className="h-1.5 w-1.5 rounded-full bg-amber-400" />
+                        {t("questTimer.paused", { defaultValue: "Pausado" })}
+                      </span>
+                    ) : (
+                      <span className="inline-flex items-center gap-1 rounded-full bg-surface-muted px-2 py-0.5 text-micro font-medium text-foreground-muted">
+                        {t("questTimer.stopped", { defaultValue: "Parado" })}
+                      </span>
+                    )}
+                  </div>
+                  <p className="text-micro text-foreground-muted">
+                    {t("questTimer.timerLabel", { defaultValue: "Tempo decorrido da quest" })}
+                  </p>
+                </div>
+              </div>
+
+              {activeQuest.status === "IN_PROGRESS" && (
+                <button
+                  type="button"
+                  className={`inline-flex items-center gap-1.5 rounded-md px-3 py-1.5 text-small font-medium transition-colors ds-focus ${
+                    activeQuest.timerRunning
+                      ? "bg-amber-500/20 text-amber-300 hover:bg-amber-500/30 border border-amber-500/30"
+                      : "bg-emerald-500/20 text-emerald-300 hover:bg-emerald-500/30 border border-emerald-500/30"
+                  }`}
+                  disabled={isUpdatingTimer || isBusy}
+                  onClick={handleToggleTimer}
+                >
+                  {activeQuest.timerRunning ? (
+                    <>
+                      <span>⏸️</span>
+                      <span>{t("questTimer.pause", { defaultValue: "Pausar" })}</span>
+                    </>
+                  ) : (
+                    <>
+                      <span>▶️</span>
+                      <span>
+                        {liveSeconds > 0
+                          ? t("questTimer.resume", { defaultValue: "Retomar" })
+                          : t("questTimer.start", { defaultValue: "Iniciar timer" })}
+                      </span>
+                    </>
+                  )}
+                </button>
+              )}
+            </div>
+          )}
+
         {isEditing ? (
           <div className="mt-6">
             <QuestMissionFields
@@ -336,12 +478,23 @@ export default function QuestDetailModal({
                           isBusy
                         }
                         onChange={(event) =>
-                          onToggleMission(activeQuest.id, mission.id, event.target.checked)
+                          handleMissionToggle(mission, event.target.checked)
                         }
                       />
                       <span className={mission.isCompleted ? "line-through opacity-70" : ""}>
                         <LinkifiedText text={mission.title} />
                       </span>
+                      {mission.durationSeconds != null && (
+                        <span
+                          className="ml-auto inline-flex items-center gap-1 rounded px-2 py-0.5 text-micro font-mono font-medium bg-accent/15 text-accent border border-accent/25 shrink-0"
+                          title={t("questTimer.missionDurationTitle", {
+                            defaultValue: "Tempo levado nesta missão",
+                          })}
+                        >
+                          <span>⏱️</span>
+                          <span>{formatDuration(mission.durationSeconds)}</span>
+                        </span>
+                      )}
                     </label>
                   </li>
                 ))}

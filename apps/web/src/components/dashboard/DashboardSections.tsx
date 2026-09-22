@@ -132,6 +132,12 @@ type QuestActionHandlers = {
     questId: string,
     missionId: string,
     completed: boolean,
+    durationSeconds?: number | null,
+  ) => Promise<void>;
+  onUpdateTimer?: (
+    questId: string,
+    action: "START" | "PAUSE" | "SYNC",
+    timerSeconds?: number,
   ) => Promise<void>;
   startingQuestId: string | null;
   actionQuestId: string | null;
@@ -171,6 +177,7 @@ function TodaysDailiesPanel({
   evidenceUrl,
   skillOptions,
   actionError,
+  onUpdateTimer,
 }: TodaysDailiesPanelProps) {
   const { t } = useTranslation();
   const sortedQuests = sortQuestsByDashboardPriority(quests);
@@ -204,6 +211,7 @@ function TodaysDailiesPanel({
           savingQuestId={savingQuestId}
           onToggleMission={onToggleMission}
           onToggleEvidence={onToggleEvidence}
+          onUpdateTimer={onUpdateTimer}
         />
       )}
     </Panel>
@@ -258,6 +266,12 @@ type DashboardContentProps = {
     questId: string,
     missionId: string,
     completed: boolean,
+    durationSeconds?: number | null,
+  ) => Promise<void>;
+  onUpdateTimer?: (
+    questId: string,
+    action: "START" | "PAUSE" | "SYNC",
+    timerSeconds?: number,
   ) => Promise<void>;
   onToggleEvidence: (questId: string | null) => void;
   onEvidenceUrlChange: (value: string) => void;
@@ -301,6 +315,7 @@ function DashboardContent({
   evidenceUrl,
   skillOptions,
   questActionError,
+  onUpdateTimer,
 }: DashboardContentProps) {
   const { t } = useTranslation();
   const { formatDateTime } = useAppLocale();
@@ -340,6 +355,7 @@ function DashboardContent({
         evidenceUrl={evidenceUrl}
         skillOptions={skillOptions}
         actionError={questActionError}
+        onUpdateTimer={onUpdateTimer}
       />
 
       <div className="grid gap-6 lg:grid-cols-2">

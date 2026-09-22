@@ -10,6 +10,7 @@ type QuestMissionRow = {
   display_order: number;
   is_completed: boolean;
   completed_at: Date | null;
+  duration_seconds: number | null;
   created_at: Date;
   updated_at: Date;
 };
@@ -36,9 +37,10 @@ export default class PostgresQuestMissionRepository implements QuestMissionRepos
             display_order,
             is_completed,
             completed_at,
+            duration_seconds,
             created_at,
             updated_at
-          ) VALUES ($1, $2, $3, $4, $5, $6, $7, $8)
+          ) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9)
           `,
           [
             mission.getId().toString(),
@@ -47,6 +49,7 @@ export default class PostgresQuestMissionRepository implements QuestMissionRepos
             mission.getDisplayOrder(),
             mission.isMissionCompleted(),
             mission.getCompletedAt(),
+            mission.getDurationSeconds(),
             mission.getCreatedAt(),
             mission.getUpdatedAt(),
           ],
@@ -89,6 +92,7 @@ export default class PostgresQuestMissionRepository implements QuestMissionRepos
             display_order,
             is_completed,
             completed_at,
+            duration_seconds,
             created_at,
             updated_at
           FROM quest_missions
@@ -125,6 +129,7 @@ export default class PostgresQuestMissionRepository implements QuestMissionRepos
             display_order,
             is_completed,
             completed_at,
+            duration_seconds,
             created_at,
             updated_at
           FROM quest_missions
@@ -160,7 +165,8 @@ export default class PostgresQuestMissionRepository implements QuestMissionRepos
             display_order = $3,
             is_completed = $4,
             completed_at = $5,
-            updated_at = $6
+            duration_seconds = $6,
+            updated_at = $7
           WHERE id = $1
           `,
           [
@@ -169,6 +175,7 @@ export default class PostgresQuestMissionRepository implements QuestMissionRepos
             mission.getDisplayOrder(),
             mission.isMissionCompleted(),
             mission.getCompletedAt(),
+            mission.getDurationSeconds(),
             mission.getUpdatedAt(),
           ],
         );
@@ -199,6 +206,7 @@ export default class PostgresQuestMissionRepository implements QuestMissionRepos
       displayOrder: row.display_order,
       isCompleted: row.is_completed,
       completedAt: row.completed_at,
+      durationSeconds: row.duration_seconds,
       createdAt: row.created_at,
       updatedAt: row.updated_at,
     });

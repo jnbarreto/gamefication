@@ -41,6 +41,7 @@ export type QuestMissionResponse = {
   displayOrder: number;
   isCompleted: boolean;
   completedAt: string | null;
+  durationSeconds: number | null;
 };
 
 export type QuestResponse = {
@@ -57,6 +58,9 @@ export type QuestResponse = {
   dueDate: string | null;
   completedAt: string | null;
   notes: string | null;
+  timerSeconds: number;
+  timerRunning: boolean;
+  timerStartedAt: string | null;
   createdAt: string;
   updatedAt: string;
 };

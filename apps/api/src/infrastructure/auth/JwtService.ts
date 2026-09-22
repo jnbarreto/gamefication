@@ -14,7 +14,9 @@ export default class JwtService {
   static sign(payload: JwtPayload): string {
     const { jwtSecret, jwtExpiresIn } = getAuthConfig();
 
-    return jwt.sign(payload, jwtSecret, { expiresIn: jwtExpiresIn });
+    return jwt.sign(payload, jwtSecret, {
+      expiresIn: jwtExpiresIn as jwt.SignOptions["expiresIn"],
+    });
   }
 
   static verify(token: string): JwtPayload {

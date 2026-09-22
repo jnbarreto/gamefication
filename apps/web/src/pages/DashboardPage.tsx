@@ -15,8 +15,10 @@ import {
   startQuest,
   updateQuest,
   updateQuestMission,
+  updateQuestTimer,
   type UpdateQuestRequest,
 } from "@/lib/api/quests";
+import StartQuestTimerModal from "@/components/quests/StartQuestTimerModal";
 import { fetchSkillTree } from "@/lib/api/skills";
 import type { DashboardResponse, QuestResponse, SkillCategoryResponse } from "@/lib/api/types";
 import { useConfirm } from "@/lib/confirm/ConfirmDialogProvider";
@@ -79,6 +81,7 @@ export default function DashboardPage() {
   const [togglingMissionId, setTogglingMissionId] = useState<string | null>(null);
   const [showEvidenceForId, setShowEvidenceForId] = useState<string | null>(null);
   const [evidenceUrl, setEvidenceUrl] = useState("");
+  const [pendingStartQuest, setPendingStartQuest] = useState<QuestResponse | null>(null);
 
   const loadDashboard = useCallback(async () => {
     const [dashboardResult, activeQuestsResult, skillTreeResult] = await Promise.all([
@@ -104,11 +107,23 @@ export default function DashboardPage() {
   }, [loadDashboard, t]);
 
   async function handleStartQuest(questId: string) {
+    const targetQuest =
+      activeQuests.find((q) => q.id === questId) ||
+      dashboard?.todayQuests.find((q) => q.id === questId);
+
+    if (targetQuest) {
+      setPendingStartQuest(targetQuest);
+    } else {
+      await executeStartQuest(questId, false);
+    }
+  }
+
+  async function executeStartQuest(questId: string, startTimer: boolean) {
     setQuestActionError(null);
     setStartingQuestId(questId);
 
     try {
-      const result = await startQuest(questId);
+      const result = await startQuest(questId, { startTimer });
       setDashboard((current) =>
         current
           ? {
@@ -128,6 +143,34 @@ export default function DashboardPage() {
       );
     } finally {
       setStartingQuestId(null);
+    }
+  }
+
+  async function handleUpdateTimer(
+    questId: string,
+    action: "START" | "PAUSE" | "SYNC",
+    timerSeconds?: number,
+  ) {
+    setQuestActionError(null);
+    try {
+      const result = await updateQuestTimer(questId, action, timerSeconds);
+      setDashboard((current) =>
+        current
+          ? {
+              ...current,
+              todayQuests: mergeQuestUpdate(current.todayQuests, result.quest),
+            }
+          : current,
+      );
+      setActiveQuests((current) => mergeQuestUpdate(current, result.quest));
+    } catch (err: unknown) {
+      setQuestActionError(
+        err instanceof ApiError
+          ? err.message
+          : err instanceof Error
+            ? err.message
+            : t("errors.updateQuest"),
+      );
     }
   }
 
@@ -293,12 +336,18 @@ export default function DashboardPage() {
     questId: string,
     missionId: string,
     completed: boolean,
+    durationSeconds?: number | null,
   ) {
     setQuestActionError(null);
     setTogglingMissionId(missionId);
 
     try {
-      const result = await updateQuestMission(questId, missionId, completed);
+      const result = await updateQuestMission(
+        questId,
+        missionId,
+        completed,
+        durationSeconds,
+      );
       setDashboard((current) =>
         current
           ? {
@@ -349,6 +398,7 @@ export default function DashboardPage() {
   }
 
   return (
+    <>
     <DashboardContent
       dashboard={dashboard}
       activeQuests={activeQuests}
@@ -368,6 +418,20 @@ export default function DashboardPage() {
       onToggleEvidence={handleToggleEvidence}
       onEvidenceUrlChange={setEvidenceUrl}
       questActionError={questActionError}
+      onUpdateTimer={handleUpdateTimer}
     />
+
+    <StartQuestTimerModal
+      open={pendingStartQuest !== null}
+      questTitle={pendingStartQuest?.title ?? ""}
+      onConfirm={async (startTimer) => {
+        if (!pendingStartQuest) return;
+        const id = pendingStartQuest.id;
+        setPendingStartQuest(null);
+        await executeStartQuest(id, startTimer);
+      }}
+      onClose={() => setPendingStartQuest(null)}
+    />
+    </>
   );
 }

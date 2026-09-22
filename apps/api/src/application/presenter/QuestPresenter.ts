@@ -22,6 +22,7 @@ export type QuestMissionResponse = {
   displayOrder: number;
   isCompleted: boolean;
   completedAt: string | null;
+  durationSeconds: number | null;
 };
 
 export type QuestResponse = {
@@ -38,6 +39,9 @@ export type QuestResponse = {
   dueDate: string | null;
   completedAt: string | null;
   notes: string | null;
+  timerSeconds: number;
+  timerRunning: boolean;
+  timerStartedAt: string | null;
   createdAt: string;
   updatedAt: string;
 };
@@ -100,6 +104,7 @@ export function presentQuestMission(mission: QuestMission): QuestMissionResponse
     displayOrder: mission.getDisplayOrder(),
     isCompleted: mission.isMissionCompleted(),
     completedAt: mission.getCompletedAt()?.toISOString() ?? null,
+    durationSeconds: mission.getDurationSeconds(),
   };
 }
 
@@ -124,6 +129,9 @@ export function presentQuest(
     dueDate: quest.getDueDate()?.toISOString() ?? null,
     completedAt: quest.getCompletedAt()?.toISOString() ?? null,
     notes: quest.getNotes(),
+    timerSeconds: quest.getTimerSeconds(),
+    timerRunning: quest.isTimerRunning(),
+    timerStartedAt: quest.getTimerStartedAt()?.toISOString() ?? null,
     createdAt: quest.getCreatedAt().toISOString(),
     updatedAt: quest.getUpdatedAt().toISOString(),
   };

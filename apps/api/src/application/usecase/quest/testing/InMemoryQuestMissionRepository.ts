@@ -1,5 +1,5 @@
-import type QuestMissionRepository from "../../application/repository/QuestMissionRepository.js";
-import QuestMission from "../../domain/quest/QuestMission.js";
+import type QuestMissionRepository from "../../../repository/QuestMissionRepository.js";
+import QuestMission from "../../../../domain/quest/QuestMission.js";
 
 export class InMemoryQuestMissionRepository implements QuestMissionRepository {
   private missions: QuestMission[] = [];
@@ -42,5 +42,11 @@ export class InMemoryQuestMissionRepository implements QuestMissionRepository {
     if (index >= 0) {
       this.missions[index] = mission;
     }
+  }
+
+  async deleteById(missionId: string): Promise<void> {
+    this.missions = this.missions.filter(
+      (item) => item.getId().toString() !== missionId,
+    );
   }
 }

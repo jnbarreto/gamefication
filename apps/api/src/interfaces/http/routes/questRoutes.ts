@@ -17,6 +17,7 @@ import ReopenQuest from "../../../application/usecase/quest/ReopenQuest.js";
 import StartQuest from "../../../application/usecase/quest/StartQuest.js";
 import UpdateQuest from "../../../application/usecase/quest/UpdateQuest.js";
 import UpdateQuestMission from "../../../application/usecase/quest/UpdateQuestMission.js";
+import UpdateQuestTimer from "../../../application/usecase/quest/UpdateQuestTimer.js";
 import PostgresCharacterRepository from "../../../infrastructure/repository/PostgresCharacterRepository.js";
 import PostgresCharacterSkillRepository from "../../../infrastructure/repository/PostgresCharacterSkillRepository.js";
 import PostgresQuestCompletionRepository from "../../../infrastructure/repository/PostgresQuestCompletionRepository.js";
@@ -31,6 +32,7 @@ import { parseListQuestsQuery } from "../validation/parseListQuestsQuery.js";
 import { parseQuestIdParam } from "../validation/parseQuestIdParam.js";
 import { parseUpdateQuestBody } from "../validation/parseUpdateQuestBody.js";
 import { parseUpdateQuestMissionBody } from "../validation/parseUpdateQuestMissionBody.js";
+import { parseUpdateQuestTimerBody } from "../validation/parseUpdateQuestTimerBody.js";
 
 const timezone = process.env.TIMEZONE ?? "America/Sao_Paulo";
 const characterRepository = new PostgresCharacterRepository();
@@ -83,6 +85,7 @@ const updateQuestMission = new UpdateQuestMission(
   questRepository,
   missionRepository,
 );
+const updateQuestTimer = new UpdateQuestTimer(characterRepository, questRepository);
 
 export function registerQuestRoutes(app: Express): void {
   app.get(
@@ -97,8 +100,8 @@ export function registerQuestRoutes(app: Express): void {
   app.get(
     "/api/v1/quests",
     asyncHandler(async (req, res) => {
-      const filter = parseListQuestsQuery(req.query as Record<string, unknown>);
-      const result = await listQuests.execute(requireAuth(req).userId, filter);
+      const query = parseListQuestsQuery(req.query);
+      const result = await listQuests.execute(requireAuth(req).userId, query);
 
       res.json(presentQuestList(result.quests, result.missionsByQuestId));
     }),
@@ -131,7 +134,29 @@ export function registerQuestRoutes(app: Express): void {
     "/api/v1/quests/:id/start",
     asyncHandler(async (req, res) => {
       const questId = parseQuestIdParam(req.params.id);
-      const quest = await startQuest.execute(requireAuth(req).userId, questId);
+      const startTimer =
+        req.body && typeof req.body === "object" && "startTimer" in req.body
+          ? Boolean((req.body as Record<string, unknown>).startTimer)
+          : false;
+      const quest = await startQuest.execute(requireAuth(req).userId, questId, {
+        startTimer,
+      });
+      const missions = await missionRepository.findByQuestId(questId);
+
+      res.json({ quest: presentQuest(quest, missions) });
+    }),
+  );
+
+  app.patch(
+    "/api/v1/quests/:id/timer",
+    asyncHandler(async (req, res) => {
+      const questId = parseQuestIdParam(req.params.id);
+      const input = parseUpdateQuestTimerBody(req.body);
+      const quest = await updateQuestTimer.execute(
+        requireAuth(req).userId,
+        questId,
+        input,
+      );
       const missions = await missionRepository.findByQuestId(questId);
 
       res.json({ quest: presentQuest(quest, missions) });

@@ -16,6 +16,7 @@ export type RebuildQuestMissionProps = {
   displayOrder: number;
   isCompleted: boolean;
   completedAt: Date | null;
+  durationSeconds?: number | null;
   createdAt: Date;
   updatedAt: Date;
 };
@@ -28,6 +29,7 @@ export default class QuestMission {
     private displayOrder: number,
     private isCompleted: boolean,
     private completedAt: Date | null,
+    private durationSeconds: number | null,
     private readonly createdAt: Date,
     private updatedAt: Date,
   ) {}
@@ -42,6 +44,7 @@ export default class QuestMission {
       QuestMission.requireDisplayOrder(props.displayOrder),
       false,
       null,
+      null,
       now,
       now,
     );
@@ -55,6 +58,7 @@ export default class QuestMission {
       props.displayOrder,
       props.isCompleted,
       props.completedAt,
+      props.durationSeconds ?? null,
       props.createdAt,
       props.updatedAt,
     );
@@ -84,6 +88,10 @@ export default class QuestMission {
     return this.completedAt;
   }
 
+  getDurationSeconds(): number | null {
+    return this.durationSeconds;
+  }
+
   getCreatedAt(): Date {
     return this.createdAt;
   }
@@ -92,9 +100,14 @@ export default class QuestMission {
     return this.updatedAt;
   }
 
-  setCompleted(completed: boolean, completedAt: Date = new Date()): void {
+  setCompleted(
+    completed: boolean,
+    completedAt: Date = new Date(),
+    durationSeconds: number | null = null,
+  ): void {
     this.isCompleted = completed;
     this.completedAt = completed ? completedAt : null;
+    this.durationSeconds = completed ? durationSeconds : null;
     this.touch();
   }
 

@@ -5,6 +5,7 @@ import { Badge, questItemClass } from "@/components/design";
 import type { QuestResponse } from "@/lib/api/types";
 import { completedMissionCount } from "@/lib/quests/questMissionProgress";
 import { questReopenPillButtonClass } from "@/lib/quests/questStatusPill";
+import { formatDuration } from "@/lib/quests/questTimer";
 import { LinkifiedText } from "../ui/LinkifiedText";
 
 type QuestBoardCardProps = {
@@ -30,9 +31,14 @@ type QuestBoardCardProps = {
 type MissionPreviewRowProps = {
   title: string;
   isCompleted: boolean;
+  durationSeconds?: number | null;
 };
 
-function MissionPreviewRow({ title, isCompleted }: MissionPreviewRowProps) {
+function MissionPreviewRow({
+  title,
+  isCompleted,
+  durationSeconds,
+}: MissionPreviewRowProps) {
   return (
     <div className="ds-quest-board-card__mission ds-quest-board-card__mission--preview">
       <input
@@ -51,6 +57,12 @@ function MissionPreviewRow({ title, isCompleted }: MissionPreviewRowProps) {
           <LinkifiedText text={title} />
         </span>
       </span>
+      {durationSeconds != null && (
+        <span className="ml-auto inline-flex items-center gap-0.5 text-micro font-mono text-accent shrink-0">
+          <span>⏱️</span>
+          <span>{formatDuration(durationSeconds)}</span>
+        </span>
+      )}
     </div>
   );
 }
@@ -165,6 +177,26 @@ export default function QuestBoardCard({
         <p className="ds-quest-board-card__meta">
           {quest.type} · {quest.difficulty} ·{" "}
           <span className="text-xp">{quest.baseXp} {t("common.xp")}</span>
+          {(quest.timerRunning || (quest.timerSeconds != null && quest.timerSeconds > 0)) && (
+            <>
+              {" "}·{" "}
+              <span
+                className={`inline-flex items-center gap-1 font-mono text-micro ${
+                  quest.timerRunning
+                    ? "text-emerald-400 font-semibold animate-pulse"
+                    : "text-foreground-muted"
+                }`}
+                title={t("questTimer.timerLabel", { defaultValue: "Tempo decorrido" })}
+              >
+                <span>⏱️</span>
+                <span>
+                  {quest.timerRunning
+                    ? t("questTimer.running", { defaultValue: "Timer ativo" })
+                    : formatDuration(quest.timerSeconds!)}
+                </span>
+              </span>
+            </>
+          )}
         </p>
       </header>
 
@@ -190,6 +222,7 @@ export default function QuestBoardCard({
                   <MissionPreviewRow
                     title={mission.title}
                     isCompleted={mission.isCompleted}
+                    durationSeconds={mission.durationSeconds}
                   />
                 </li>
               ))}

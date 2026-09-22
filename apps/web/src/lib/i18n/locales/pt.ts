@@ -240,6 +240,22 @@ const pt = {
     cannotDeleteLastBoard: "Não é possível excluir o único quadro.",
     defaultBoardName: "Quadro Principal",
   },
+  questTimer: {
+    modalTitle: "Iniciar Quest com Timer?",
+    modalQuestion: "Deseja ativar a contagem de tempo para esta quest?",
+    modalHint:
+      "O timer registra quanto tempo você leva para concluir a quest e calcula a duração de cada missão. É totalmente opcional.",
+    startWithTimer: "Sim, iniciar com timer",
+    startWithoutTimer: "Iniciar sem timer",
+    timerLabel: "Tempo decorrido da quest",
+    running: "Em andamento",
+    paused: "Pausado",
+    stopped: "Parado",
+    pause: "Pausar",
+    resume: "Retomar",
+    start: "Iniciar timer",
+    missionDurationTitle: "Tempo levado nesta missão",
+  },
   skills: {
     title: "Habilidades",
     subtitle: "{{categories}} categorias · {{skills}} habilidades rastreadas",

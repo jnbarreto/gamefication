@@ -20,6 +20,9 @@ type QuestRow = {
   notes: string | null;
   calendar_day: string | null;
   calendar_week_start: string | null;
+  timer_seconds: number;
+  timer_running: boolean;
+  timer_started_at: Date | null;
   created_at: Date;
   updated_at: Date;
   skill_id: string | null;
@@ -55,9 +58,12 @@ export default class PostgresQuestRepository implements QuestRepository {
           notes,
           calendar_day,
           calendar_week_start,
+          timer_seconds,
+          timer_running,
+          timer_started_at,
           created_at,
           updated_at
-        ) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14, $15)
+        ) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14, $15, $16, $17, $18)
         `,
         [
           quest.getId().toString(),
@@ -73,6 +79,9 @@ export default class PostgresQuestRepository implements QuestRepository {
           quest.getNotes(),
           quest.getCalendarDay(),
           quest.getCalendarWeekStart(),
+          quest.getTimerSeconds(),
+          quest.isTimerRunning(),
+          quest.getTimerStartedAt(),
           quest.getCreatedAt(),
           quest.getUpdatedAt(),
         ],
@@ -125,8 +134,12 @@ export default class PostgresQuestRepository implements QuestRepository {
           difficulty = $4,
           base_xp = $5,
           status = $6,
-          updated_at = $7
-        WHERE id = $8
+          completed_at = $7,
+          timer_seconds = $8,
+          timer_running = $9,
+          timer_started_at = $10,
+          updated_at = $11
+        WHERE id = $12
         `,
         [
           quest.getTitle(),
@@ -135,6 +148,10 @@ export default class PostgresQuestRepository implements QuestRepository {
           quest.getDifficulty(),
           quest.getBaseXp(),
           quest.getStatus(),
+          quest.getCompletedAt(),
+          quest.getTimerSeconds(),
+          quest.isTimerRunning(),
+          quest.getTimerStartedAt(),
           quest.getUpdatedAt(),
           quest.getId().toString(),
         ],
@@ -376,6 +393,9 @@ export default class PostgresQuestRepository implements QuestRepository {
             q.notes,
             q.calendar_day,
             q.calendar_week_start,
+            q.timer_seconds,
+            q.timer_running,
+            q.timer_started_at,
             q.created_at,
             q.updated_at,
             qsa.skill_id,
@@ -444,6 +464,9 @@ export default class PostgresQuestRepository implements QuestRepository {
         notes: quest.notes,
         calendarDay: quest.calendar_day,
         calendarWeekStart: quest.calendar_week_start,
+        timerSeconds: quest.timer_seconds,
+        timerRunning: quest.timer_running,
+        timerStartedAt: quest.timer_started_at,
         createdAt: quest.created_at,
         updatedAt: quest.updated_at,
       }),
