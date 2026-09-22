@@ -1,6 +1,6 @@
 import { useEffect, useRef } from "react";
 import { useTranslation } from "react-i18next";
-import ampulhetaImg from "../../../assets/ampulheta.png";
+import ampulhetaImg from "../../../assets/ampulheta_estatica.png";
 
 type StartQuestTimerModalProps = {
   open: boolean;
@@ -105,7 +105,7 @@ export default function StartQuestTimerModal({
             <img
               src={ampulhetaImg}
               alt=""
-              className="h-4 w-4 object-contain select-none"
+              className="h-4 w-4 object-cover select-none rounded-xs"
             />
             <span>{t("questTimer.startWithTimer", { defaultValue: "Cronometrar jornada" })}</span>
           </button>

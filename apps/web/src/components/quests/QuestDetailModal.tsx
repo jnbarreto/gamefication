@@ -34,7 +34,8 @@ import {
   formatDigitalTimer,
   formatDuration,
 } from "@/lib/quests/questTimer";
-import ampulhetaImg from "../../../assets/ampulheta.png";
+import ampulhetaAnimadaGif from "../../../assets/animacao_ampulheta.gif";
+import ampulhetaEstaticaImg from "../../../assets/ampulheta_estatica.png";
 
 type QuestDetailModalProps = {
   quest: QuestResponse | null;
@@ -421,9 +422,9 @@ export default function QuestDetailModal({
             <div className="my-2.5 flex items-center justify-between gap-3 rounded border border-border/30 bg-surface-muted/30 px-3 py-1.5 transition-colors">
               <div className="flex items-center gap-2.5">
                 <img
-                  src={ampulhetaImg}
+                  src={activeQuest.timerRunning ? ampulhetaAnimadaGif : ampulhetaEstaticaImg}
                   alt="Ampulheta"
-                  className="h-6 w-6 object-contain select-none"
+                  className="h-6 w-6 object-cover select-none rounded"
                 />
                 <span className="font-mono text-base font-semibold tracking-wider text-foreground">
                   {formatDigitalTimer(liveSeconds)}
