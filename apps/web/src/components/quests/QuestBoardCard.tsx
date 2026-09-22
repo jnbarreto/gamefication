@@ -1,10 +1,11 @@
-import { type KeyboardEvent } from "react";
+import { useRef, type KeyboardEvent } from "react";
 import { useTranslation } from "react-i18next";
 
 import { Badge, questItemClass } from "@/components/design";
 import type { QuestResponse } from "@/lib/api/types";
 import { completedMissionCount } from "@/lib/quests/questMissionProgress";
 import { questReopenPillButtonClass } from "@/lib/quests/questStatusPill";
+import { LinkifiedText } from "../ui/LinkifiedText";
 
 type QuestBoardCardProps = {
   quest: QuestResponse;
@@ -16,14 +17,20 @@ type QuestBoardCardProps = {
   onStart: (questId: string) => void;
   onReopen?: (questId: string) => void;
   onRemoveFromBoard?: (questId: string) => void;
+  draggable?: boolean;
+  onDragStart?: (event: React.DragEvent<HTMLElement>) => void;
+  onDragEnd?: (event: React.DragEvent<HTMLElement>) => void;
+  onDragOver?: (event: React.DragEvent<HTMLElement>) => void;
+  onDragLeave?: (event: React.DragEvent<HTMLElement>) => void;
+  onDrop?: (event: React.DragEvent<HTMLElement>) => void;
+  isDragging?: boolean;
+  dropPosition?: "above" | "below" | null;
 };
 
 type MissionPreviewRowProps = {
   title: string;
   isCompleted: boolean;
 };
-
-import { LinkifiedText } from "../ui/LinkifiedText";
 
 function MissionPreviewRow({ title, isCompleted }: MissionPreviewRowProps) {
   return (
@@ -58,15 +65,40 @@ export default function QuestBoardCard({
   onStart,
   onReopen,
   onRemoveFromBoard,
+  draggable = false,
+  onDragStart,
+  onDragEnd,
+  onDragOver,
+  onDragLeave,
+  onDrop,
+  isDragging = false,
+  dropPosition = null,
 }: QuestBoardCardProps) {
   const { t } = useTranslation();
+  const isDragActionRef = useRef(false);
   const isStarting = startingQuestId === quest.id;
   const isBusy = actionQuestId === quest.id;
   const missionTotal = quest.missions.length;
   const missionDone = completedMissionCount(quest);
 
   function handleCardClick() {
+    if (isDragging || isDragActionRef.current) {
+      isDragActionRef.current = false;
+      return;
+    }
     onOpenDetail();
+  }
+
+  function handleInternalDragStart(event: React.DragEvent<HTMLElement>) {
+    isDragActionRef.current = true;
+    onDragStart?.(event);
+  }
+
+  function handleInternalDragEnd(event: React.DragEvent<HTMLElement>) {
+    setTimeout(() => {
+      isDragActionRef.current = false;
+    }, 100);
+    onDragEnd?.(event);
   }
 
   function handleCardKeyDown(event: KeyboardEvent<HTMLElement>) {
@@ -78,7 +110,13 @@ export default function QuestBoardCard({
 
   return (
     <article
-      className={`${questItemClass(quest.status, quest.type)} ds-quest-board-card ${hideMissions ? "ds-quest-board-card--no-missions" : "ds-quest-board-card--fixed"} ${compact ? "ds-quest-board-card--compact" : ""}`}
+      draggable={draggable}
+      onDragStart={handleInternalDragStart}
+      onDragEnd={handleInternalDragEnd}
+      onDragOver={onDragOver}
+      onDragLeave={onDragLeave}
+      onDrop={onDrop}
+      className={`${questItemClass(quest.status, quest.type)} ds-quest-board-card ${hideMissions ? "ds-quest-board-card--no-missions" : "ds-quest-board-card--fixed"} ${compact ? "ds-quest-board-card--compact" : ""} ${draggable ? "cursor-grab active:cursor-grabbing" : ""} ${isDragging ? "opacity-30 scale-[0.98] pointer-events-none" : ""} ${dropPosition === "above" ? "border-t-2 !border-t-accent shadow-[0_-3px_10px_rgba(0,255,102,0.35)]" : ""} ${dropPosition === "below" ? "border-b-2 !border-b-accent shadow-[0_3px_10px_rgba(0,255,102,0.35)]" : ""}`}
       onClick={handleCardClick}
       onKeyDown={handleCardKeyDown}
       role="button"

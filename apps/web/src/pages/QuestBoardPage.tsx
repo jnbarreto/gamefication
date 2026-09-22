@@ -54,6 +54,7 @@ export default function QuestBoardPage() {
   const {
     boards,
     activeBoardId,
+    selectedIds,
     selectedIdSet,
     setActiveBoardId,
     createBoard,
@@ -62,6 +63,7 @@ export default function QuestBoardPage() {
     addQuest,
     removeQuest,
     pruneMissing,
+    reorderQuests,
   } = useQuestBoards();
 
   const loadQuests = useCallback(async () => {
@@ -115,10 +117,12 @@ export default function QuestBoardPage() {
     };
   }, [pruneMissing, t]);
 
-  const boardQuests = useMemo(
-    () => quests.filter((quest) => selectedIdSet.has(quest.id)),
-    [quests, selectedIdSet],
-  );
+  const boardQuests = useMemo(() => {
+    const questMap = new Map(quests.map((quest) => [quest.id, quest]));
+    return selectedIds
+      .map((id) => questMap.get(id))
+      .filter((quest): quest is QuestResponse => Boolean(quest));
+  }, [quests, selectedIds]);
 
   async function handleStart(questId: string) {
     setActionError(null);
@@ -291,6 +295,7 @@ export default function QuestBoardPage() {
     onToggleMission: handleToggleMission,
     onToggleEvidence: handleToggleEvidence,
     onRemoveFromBoard: removeQuest,
+    onReorderQuests: reorderQuests,
   };
 
   if (error) {

@@ -210,6 +210,31 @@ export function useQuestBoards() {
     });
   }, []);
 
+  const reorderQuests = useCallback((reorderedColumnQuestIds: string[]) => {
+    setData((current) => {
+      const active = current.boards.find((b) => b.id === current.activeBoardId);
+      if (!active) return current;
+
+      const reorderedSet = new Set(reorderedColumnQuestIds);
+      let reorderedIndex = 0;
+
+      const nextQuestIds = active.questIds.map((id) => {
+        if (reorderedSet.has(id)) {
+          const nextId = reorderedColumnQuestIds[reorderedIndex++];
+          return nextId ?? id;
+        }
+        return id;
+      });
+
+      return {
+        ...current,
+        boards: current.boards.map((b) =>
+          b.id === current.activeBoardId ? { ...b, questIds: nextQuestIds } : b,
+        ),
+      };
+    });
+  }, []);
+
   return {
     boards: data.boards,
     activeBoard,
@@ -223,6 +248,7 @@ export function useQuestBoards() {
     addQuest,
     removeQuest,
     pruneMissing,
+    reorderQuests,
   };
 }
 
