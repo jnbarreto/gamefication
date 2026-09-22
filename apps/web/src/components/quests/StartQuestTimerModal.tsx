@@ -35,7 +35,7 @@ export default function StartQuestTimerModal({
 
   return (
     <div
-      className="fixed inset-0 z-50 flex items-center justify-center bg-base/80 p-4 backdrop-blur-sm animate-in fade-in duration-200"
+      className="fixed inset-0 z-50 flex items-center justify-center bg-base/80 p-4 backdrop-blur-sm animate-in fade-in duration-150"
       onClick={(e) => {
         if (e.target === e.currentTarget) onClose();
       }}
@@ -45,21 +45,24 @@ export default function StartQuestTimerModal({
     >
       <div
         ref={modalRef}
-        className="w-full max-w-md rounded-panel border border-border/40 bg-surface p-6 shadow-2xl space-y-5"
+        className="w-full max-w-sm rounded-panel border border-border/40 bg-surface p-5 shadow-2xl space-y-4 relative"
       >
         <div className="flex items-start justify-between gap-3">
           <div className="flex items-center gap-2.5">
-            <span className="flex h-9 w-9 items-center justify-center rounded-lg bg-accent/15 text-lg text-accent">
-              ⏱️
+            <span className="flex h-7 w-7 items-center justify-center rounded bg-accent/10 border border-accent/30 font-mono text-xs text-accent">
+              ⧗
             </span>
             <div>
               <h3
                 id="start-timer-modal-title"
-                className="text-base font-semibold text-foreground"
+                className="font-flavor text-base font-semibold text-foreground tracking-wide"
               >
-                {t("questTimer.modalTitle", { defaultValue: "Iniciar Quest" })}
+                {t("questTimer.modalTitle", { defaultValue: "Iniciar Jornada" })}
               </h3>
-              <p className="line-clamp-1 text-xs text-foreground-muted mt-0.5" title={questTitle}>
+              <p
+                className="line-clamp-1 font-flavor italic text-micro text-foreground-muted mt-0.5"
+                title={questTitle}
+              >
                 {questTitle}
               </p>
             </div>
@@ -67,49 +70,49 @@ export default function StartQuestTimerModal({
           <button
             type="button"
             onClick={onClose}
-            className="text-foreground-muted hover:text-foreground text-sm px-1.5 py-0.5 rounded transition-colors"
+            className="text-foreground-muted/60 hover:text-foreground text-xs px-1.5 py-0.5 rounded transition-colors ds-focus"
             aria-label={t("common.close", { defaultValue: "Fechar" })}
           >
             ✕
           </button>
         </div>
 
-        <div className="rounded-lg border border-border/20 bg-base/40 p-3.5 space-y-2">
-          <p className="text-sm font-medium text-foreground">
+        <div className="rounded border border-border/20 bg-surface-muted/30 p-3 space-y-1.5">
+          <p className="text-small font-medium text-foreground">
             {t("questTimer.modalQuestion", {
-              defaultValue: "Deseja iniciar o cronômetro para esta quest?",
+              defaultValue: "Deseja cronometrar esta jornada?",
             })}
           </p>
-          <p className="text-xs text-foreground-muted leading-relaxed">
+          <p className="text-micro text-foreground-muted leading-relaxed font-sans">
             {t("questTimer.modalHint", {
               defaultValue:
-                "Ao iniciar o cronômetro, o tempo gasto em cada missão será registrado automaticamente quando você marcar o checkbox. Isso é opcional e você pode pausar a qualquer momento.",
+                "O tempo será registrado e a duração de cada missão será calculada conforme você as conclui.",
             })}
           </p>
         </div>
 
-        <div className="flex flex-col sm:flex-row gap-2.5 pt-2">
+        <div className="flex flex-col gap-2 pt-1">
           <button
             type="button"
             onClick={() => onConfirm(true)}
-            className="ds-btn-primary flex-1 justify-center gap-2 py-2.5 shadow-[0_0_12px_rgba(0,255,102,0.25)]"
+            className="flex items-center justify-center gap-2 rounded px-3 py-2 text-xs font-mono font-medium text-accent border border-accent/50 bg-accent/10 hover:bg-accent/20 transition-colors shadow-[0_0_10px_rgba(0,255,102,0.12)] ds-focus"
           >
-            <span>⏱️</span>
-            <span>{t("questTimer.startWithTimer", { defaultValue: "Sim, com timer" })}</span>
+            <span>⧗</span>
+            <span>{t("questTimer.startWithTimer", { defaultValue: "Cronometrar jornada" })}</span>
           </button>
 
           <button
             type="button"
             onClick={() => onConfirm(false)}
-            className="rounded-panel border border-border/30 bg-surface-muted/60 px-4 py-2.5 text-xs font-medium text-foreground hover:bg-surface-muted transition-colors flex-1 justify-center text-center"
+            className="rounded px-3 py-2 text-xs font-mono text-foreground-muted hover:text-foreground border border-border/30 hover:bg-surface-muted/40 transition-colors text-center ds-focus"
           >
-            {t("questTimer.startWithoutTimer", { defaultValue: "Iniciar sem timer" })}
+            {t("questTimer.startWithoutTimer", { defaultValue: "Iniciar sem cronômetro" })}
           </button>
 
           <button
             type="button"
             onClick={onClose}
-            className="rounded-panel px-3 py-2.5 text-xs text-foreground-muted hover:text-foreground transition-colors text-center"
+            className="text-center text-micro text-foreground-muted/60 hover:text-foreground-muted transition-colors pt-0.5"
           >
             {t("common.cancel", { defaultValue: "Cancelar" })}
           </button>

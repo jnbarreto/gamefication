@@ -158,7 +158,7 @@ export default function QuestBoardPage() {
 
   async function handleUpdateTimer(
     questId: string,
-    action: "START" | "PAUSE" | "SYNC",
+    action: "START" | "PAUSE" | "SYNC" | "RESET",
     timerSeconds?: number,
   ) {
     setActionError(null);

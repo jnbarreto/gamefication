@@ -112,6 +112,12 @@ describe("UpdateQuestTimer", () => {
       timerSeconds: 120,
     });
     expect(synced.getTimerSeconds()).toBe(120);
+
+    const reset = await useCase.execute(TEST_USER_ID, quest.getId().toString(), {
+      action: "RESET",
+    });
+    expect(reset.getTimerSeconds()).toBe(0);
+    expect(reset.isTimerRunning()).toBe(false);
   });
 
   it("rejects updating timer when quest is still TODO", async () => {

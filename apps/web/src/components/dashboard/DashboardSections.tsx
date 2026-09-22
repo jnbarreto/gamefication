@@ -136,7 +136,7 @@ type QuestActionHandlers = {
   ) => Promise<void>;
   onUpdateTimer?: (
     questId: string,
-    action: "START" | "PAUSE" | "SYNC",
+    action: "START" | "PAUSE" | "SYNC" | "RESET",
     timerSeconds?: number,
   ) => Promise<void>;
   startingQuestId: string | null;
@@ -270,7 +270,7 @@ type DashboardContentProps = {
   ) => Promise<void>;
   onUpdateTimer?: (
     questId: string,
-    action: "START" | "PAUSE" | "SYNC",
+    action: "START" | "PAUSE" | "SYNC" | "RESET",
     timerSeconds?: number,
   ) => Promise<void>;
   onToggleEvidence: (questId: string | null) => void;

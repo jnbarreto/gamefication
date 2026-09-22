@@ -34,7 +34,7 @@ type QuestCardsViewProps = {
   skillOptions?: Array<{ id: string; label: string }>;
   onUpdateTimer?: (
     questId: string,
-    action: "START" | "PAUSE" | "SYNC",
+    action: "START" | "PAUSE" | "SYNC" | "RESET",
     timerSeconds?: number,
   ) => Promise<void>;
 };

@@ -9,8 +9,15 @@ export function parseUpdateQuestTimerBody(body: unknown): UpdateQuestTimerInput 
   const record = body as Record<string, unknown>;
 
   const action = record.action;
-  if (action !== "START" && action !== "PAUSE" && action !== "SYNC") {
-    throw new ValidationError("action must be 'START', 'PAUSE', or 'SYNC'");
+  if (
+    action !== "START" &&
+    action !== "PAUSE" &&
+    action !== "SYNC" &&
+    action !== "RESET"
+  ) {
+    throw new ValidationError(
+      "action must be 'START', 'PAUSE', 'SYNC', or 'RESET'",
+    );
   }
 
   let timerSeconds: number | undefined;

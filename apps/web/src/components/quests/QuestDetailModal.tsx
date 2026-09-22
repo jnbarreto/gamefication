@@ -2,6 +2,7 @@ import { useEffect, useState } from "react";
 import { useTranslation } from "react-i18next";
 
 import { Badge } from "@/components/design";
+import { useConfirm } from "@/lib/confirm/ConfirmDialogProvider";
 import type { UpdateQuestRequest } from "@/lib/api/quests";
 import type { QuestResponse } from "@/lib/api/types";
 import {
@@ -61,7 +62,7 @@ type QuestDetailModalProps = {
   onToggleEvidence: (questId: string | null) => void;
   onUpdateTimer?: (
     questId: string,
-    action: "START" | "PAUSE" | "SYNC",
+    action: "START" | "PAUSE" | "SYNC" | "RESET",
     timerSeconds?: number,
   ) => Promise<void>;
 };
@@ -89,6 +90,7 @@ export default function QuestDetailModal({
   onUpdateTimer,
 }: QuestDetailModalProps) {
   const { t } = useTranslation();
+  const { confirm } = useConfirm();
   const [isEditing, setIsEditing] = useState(false);
   const [showAdvanced, setShowAdvanced] = useState(false);
   const [editTitle, setEditTitle] = useState("");
@@ -128,6 +130,36 @@ export default function QuestDetailModal({
       } else {
         await updateQuestTimer(quest.id, action);
       }
+    } catch {
+      // handled by caller or state
+    } finally {
+      setIsUpdatingTimer(false);
+    }
+  }
+
+  async function handleResetTimer() {
+    if (!quest) return;
+    const ok = await confirm({
+      title: t("questTimer.resetConfirmTitle", { defaultValue: "Resetar cronômetro?" }),
+      message: t("questTimer.resetConfirmMessage", {
+        defaultValue:
+          "O tempo desta quest voltará para 00:00:00. Esta ação não pode ser desfeita.",
+      }),
+      confirmLabel: t("questTimer.resetConfirmAction", { defaultValue: "Sim, resetar" }),
+      cancelLabel: t("common.cancel", { defaultValue: "Cancelar" }),
+      variant: "danger",
+    });
+
+    if (!ok) return;
+
+    setIsUpdatingTimer(true);
+    try {
+      if (onUpdateTimer) {
+        await onUpdateTimer(quest.id, "RESET");
+      } else {
+        await updateQuestTimer(quest.id, "RESET");
+      }
+      setLiveSeconds(0);
     } catch {
       // handled by caller or state
     } finally {
@@ -385,65 +417,83 @@ export default function QuestDetailModal({
           (activeQuest.status === "IN_PROGRESS" ||
             activeQuest.timerRunning ||
             liveSeconds > 0) && (
-            <div className="my-4 flex items-center justify-between rounded-lg border border-border/40 bg-surface-muted/40 p-3.5 backdrop-blur-sm">
+            <div className="my-3.5 flex flex-wrap items-center justify-between gap-3 rounded-panel border border-border/30 bg-surface-muted/30 px-3.5 py-2.5 transition-colors">
               <div className="flex items-center gap-3">
-                <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-accent/15 text-lg text-accent">
-                  ⏱️
+                <div className="flex h-8 w-8 items-center justify-center rounded bg-accent/10 border border-accent/25 font-mono text-xs text-accent">
+                  <span className={activeQuest.timerRunning ? "animate-pulse" : "opacity-80"}>⧗</span>
                 </div>
                 <div>
-                  <div className="flex items-center gap-2">
-                    <span className="font-mono text-2xl font-bold tracking-wider text-foreground">
+                  <div className="flex items-baseline gap-2">
+                    <span className="font-mono text-xl font-semibold tracking-wider text-foreground">
                       {formatDigitalTimer(liveSeconds)}
                     </span>
-                    {activeQuest.timerRunning ? (
-                      <span className="inline-flex items-center gap-1 rounded-full bg-emerald-500/20 px-2 py-0.5 text-micro font-medium text-emerald-400 animate-pulse">
-                        <span className="h-1.5 w-1.5 rounded-full bg-emerald-400" />
-                        {t("questTimer.running", { defaultValue: "Em andamento" })}
-                      </span>
-                    ) : liveSeconds > 0 ? (
-                      <span className="inline-flex items-center gap-1 rounded-full bg-amber-500/20 px-2 py-0.5 text-micro font-medium text-amber-400">
-                        <span className="h-1.5 w-1.5 rounded-full bg-amber-400" />
-                        {t("questTimer.paused", { defaultValue: "Pausado" })}
-                      </span>
-                    ) : (
-                      <span className="inline-flex items-center gap-1 rounded-full bg-surface-muted px-2 py-0.5 text-micro font-medium text-foreground-muted">
-                        {t("questTimer.stopped", { defaultValue: "Parado" })}
-                      </span>
-                    )}
+                    <span className="inline-flex items-center gap-1 font-mono text-micro">
+                      {activeQuest.timerRunning ? (
+                        <>
+                          <span className="h-1.5 w-1.5 rounded-full bg-accent animate-ping" />
+                          <span className="text-accent/90">{t("questTimer.running", { defaultValue: "Em andamento" })}</span>
+                        </>
+                      ) : liveSeconds > 0 ? (
+                        <>
+                          <span className="h-1.5 w-1.5 rounded-full bg-amber-400" />
+                          <span className="text-amber-400/90">{t("questTimer.paused", { defaultValue: "Pausado" })}</span>
+                        </>
+                      ) : (
+                        <>
+                          <span className="h-1.5 w-1.5 rounded-full bg-foreground-muted/40" />
+                          <span className="text-foreground-muted/70">{t("questTimer.stopped", { defaultValue: "Parado" })}</span>
+                        </>
+                      )}
+                    </span>
                   </div>
-                  <p className="text-micro text-foreground-muted">
-                    {t("questTimer.timerLabel", { defaultValue: "Tempo decorrido da quest" })}
-                  </p>
+                  <span className="font-flavor text-micro text-foreground-muted/60 tracking-wider uppercase block -mt-0.5">
+                    {t("questTimer.chronometer", { defaultValue: "Cronômetro de Jornada" })}
+                  </span>
                 </div>
               </div>
 
               {activeQuest.status === "IN_PROGRESS" && (
-                <button
-                  type="button"
-                  className={`inline-flex items-center gap-1.5 rounded-md px-3 py-1.5 text-small font-medium transition-colors ds-focus ${
-                    activeQuest.timerRunning
-                      ? "bg-amber-500/20 text-amber-300 hover:bg-amber-500/30 border border-amber-500/30"
-                      : "bg-emerald-500/20 text-emerald-300 hover:bg-emerald-500/30 border border-emerald-500/30"
-                  }`}
-                  disabled={isUpdatingTimer || isBusy}
-                  onClick={handleToggleTimer}
-                >
-                  {activeQuest.timerRunning ? (
-                    <>
-                      <span>⏸️</span>
-                      <span>{t("questTimer.pause", { defaultValue: "Pausar" })}</span>
-                    </>
-                  ) : (
-                    <>
-                      <span>▶️</span>
-                      <span>
-                        {liveSeconds > 0
-                          ? t("questTimer.resume", { defaultValue: "Retomar" })
-                          : t("questTimer.start", { defaultValue: "Iniciar timer" })}
-                      </span>
-                    </>
+                <div className="flex items-center gap-1.5">
+                  <button
+                    type="button"
+                    className={`inline-flex items-center gap-1.5 rounded px-2.5 py-1 text-xs font-mono font-medium transition-colors ds-focus ${
+                      activeQuest.timerRunning
+                        ? "border border-amber-500/40 text-amber-300 bg-amber-500/10 hover:bg-amber-500/20"
+                        : "border border-accent/40 text-accent bg-accent/10 hover:bg-accent/20"
+                    }`}
+                    disabled={isUpdatingTimer || isBusy}
+                    onClick={handleToggleTimer}
+                  >
+                    {activeQuest.timerRunning ? (
+                      <>
+                        <span className="text-[10px]">⏸</span>
+                        <span>{t("questTimer.pause", { defaultValue: "Pausar" })}</span>
+                      </>
+                    ) : (
+                      <>
+                        <span className="text-[10px]">▶</span>
+                        <span>
+                          {liveSeconds > 0
+                            ? t("questTimer.resume", { defaultValue: "Retomar" })
+                            : t("questTimer.start", { defaultValue: "Iniciar" })}
+                        </span>
+                      </>
+                    )}
+                  </button>
+
+                  {liveSeconds > 0 && (
+                    <button
+                      type="button"
+                      className="inline-flex items-center gap-1 rounded border border-border/40 px-2 py-1 text-xs font-mono text-foreground-muted hover:text-danger hover:border-danger/40 hover:bg-danger/5 transition-colors ds-focus"
+                      title={t("questTimer.reset", { defaultValue: "Resetar cronômetro" })}
+                      disabled={isUpdatingTimer || isBusy}
+                      onClick={handleResetTimer}
+                    >
+                      <span className="text-[10px]">↺</span>
+                      <span>{t("questTimer.reset", { defaultValue: "Resetar" })}</span>
+                    </button>
                   )}
-                </button>
+                </div>
               )}
             </div>
           )}
@@ -486,12 +536,12 @@ export default function QuestDetailModal({
                       </span>
                       {mission.durationSeconds != null && (
                         <span
-                          className="ml-auto inline-flex items-center gap-1 rounded px-2 py-0.5 text-micro font-mono font-medium bg-accent/15 text-accent border border-accent/25 shrink-0"
+                          className="ml-auto inline-flex items-center gap-1 font-mono text-micro text-accent/80 tracking-tight shrink-0 font-medium select-none"
                           title={t("questTimer.missionDurationTitle", {
-                            defaultValue: "Tempo levado nesta missão",
+                            defaultValue: "Duração desta missão",
                           })}
                         >
-                          <span>⏱️</span>
+                          <span className="opacity-50 text-[10px]">⧗</span>
                           <span>{formatDuration(mission.durationSeconds)}</span>
                         </span>
                       )}

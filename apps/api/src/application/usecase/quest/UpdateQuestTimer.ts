@@ -5,7 +5,7 @@ import ApplicationError from "../../exception/ApplicationError.js";
 import type CharacterRepository from "../../repository/CharacterRepository.js";
 import type QuestRepository from "../../repository/QuestRepository.js";
 
-export type UpdateQuestTimerAction = "START" | "PAUSE" | "SYNC";
+export type UpdateQuestTimerAction = "START" | "PAUSE" | "SYNC" | "RESET";
 
 export type UpdateQuestTimerInput = {
   action: UpdateQuestTimerAction;
@@ -47,6 +47,8 @@ export default class UpdateQuestTimer {
       if (typeof input.timerSeconds === "number") {
         quest.syncTimer(input.timerSeconds);
       }
+    } else if (input.action === "RESET") {
+      quest.resetTimer();
     }
 
     await this.questRepository.update(quest);

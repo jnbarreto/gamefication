@@ -134,7 +134,7 @@ export function updateQuestMission(
 
 export function updateQuestTimer(
   questId: string,
-  action: "START" | "PAUSE" | "SYNC",
+  action: "START" | "PAUSE" | "SYNC" | "RESET",
   timerSeconds?: number,
 ): Promise<StartQuestResponse> {
   return apiPatch<StartQuestResponse>(`/quests/${questId}/timer`, {

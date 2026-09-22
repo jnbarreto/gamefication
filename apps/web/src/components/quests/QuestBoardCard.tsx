@@ -58,8 +58,8 @@ function MissionPreviewRow({
         </span>
       </span>
       {durationSeconds != null && (
-        <span className="ml-auto inline-flex items-center gap-0.5 text-micro font-mono text-accent shrink-0">
-          <span>⏱️</span>
+        <span className="ml-auto inline-flex items-center gap-0.5 text-micro font-mono text-accent/80 tracking-tight shrink-0 font-medium">
+          <span className="opacity-50 text-[10px]">⧗</span>
           <span>{formatDuration(durationSeconds)}</span>
         </span>
       )}
@@ -183,12 +183,14 @@ export default function QuestBoardCard({
               <span
                 className={`inline-flex items-center gap-1 font-mono text-micro ${
                   quest.timerRunning
-                    ? "text-emerald-400 font-semibold animate-pulse"
+                    ? "text-accent font-medium"
                     : "text-foreground-muted"
                 }`}
                 title={t("questTimer.timerLabel", { defaultValue: "Tempo decorrido" })}
               >
-                <span>⏱️</span>
+                <span className={`opacity-60 text-[10px] ${quest.timerRunning ? "animate-pulse text-accent" : ""}`}>
+                  ⧗
+                </span>
                 <span>
                   {quest.timerRunning
                     ? t("questTimer.running", { defaultValue: "Timer ativo" })

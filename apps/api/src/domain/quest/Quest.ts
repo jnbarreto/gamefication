@@ -182,6 +182,13 @@ export default class Quest {
     this.touch();
   }
 
+  resetTimer(): void {
+    this.timerSeconds = 0;
+    this.timerRunning = false;
+    this.timerStartedAt = null;
+    this.touch();
+  }
+
   syncTimer(timerSeconds: number): void {
     if (timerSeconds >= 0) {
       this.timerSeconds = timerSeconds;
