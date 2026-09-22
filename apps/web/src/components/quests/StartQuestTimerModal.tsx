@@ -1,5 +1,6 @@
 import { useEffect, useRef } from "react";
 import { useTranslation } from "react-i18next";
+import ampulhetaImg from "../../../assets/ampulheta.png";
 
 type StartQuestTimerModalProps = {
   open: boolean;
@@ -49,9 +50,13 @@ export default function StartQuestTimerModal({
       >
         <div className="flex items-start justify-between gap-3">
           <div className="flex items-center gap-2.5">
-            <span className="flex h-7 w-7 items-center justify-center rounded bg-accent/10 border border-accent/30 font-mono text-xs text-accent">
-              ⧗
-            </span>
+            <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded bg-accent/10 border border-accent/30 p-1">
+              <img
+                src={ampulhetaImg}
+                alt="Ampulheta"
+                className="h-full w-full object-contain select-none"
+              />
+            </div>
             <div>
               <h3
                 id="start-timer-modal-title"
@@ -97,7 +102,11 @@ export default function StartQuestTimerModal({
             onClick={() => onConfirm(true)}
             className="flex items-center justify-center gap-2 rounded px-3 py-2 text-xs font-mono font-medium text-accent border border-accent/50 bg-accent/10 hover:bg-accent/20 transition-colors shadow-[0_0_10px_rgba(0,255,102,0.12)] ds-focus"
           >
-            <span>⧗</span>
+            <img
+              src={ampulhetaImg}
+              alt=""
+              className="h-4 w-4 object-contain select-none"
+            />
             <span>{t("questTimer.startWithTimer", { defaultValue: "Cronometrar jornada" })}</span>
           </button>
 

@@ -34,6 +34,7 @@ import {
   formatDigitalTimer,
   formatDuration,
 } from "@/lib/quests/questTimer";
+import ampulhetaImg from "../../../assets/ampulheta.png";
 
 type QuestDetailModalProps = {
   quest: QuestResponse | null;
@@ -417,46 +418,23 @@ export default function QuestDetailModal({
           (activeQuest.status === "IN_PROGRESS" ||
             activeQuest.timerRunning ||
             liveSeconds > 0) && (
-            <div className="my-3.5 flex flex-wrap items-center justify-between gap-3 rounded-panel border border-border/30 bg-surface-muted/30 px-3.5 py-2.5 transition-colors">
-              <div className="flex items-center gap-3">
-                <div className="flex h-8 w-8 items-center justify-center rounded bg-accent/10 border border-accent/25 font-mono text-xs text-accent">
-                  <span className={activeQuest.timerRunning ? "animate-pulse" : "opacity-80"}>⧗</span>
-                </div>
-                <div>
-                  <div className="flex items-baseline gap-2">
-                    <span className="font-mono text-xl font-semibold tracking-wider text-foreground">
-                      {formatDigitalTimer(liveSeconds)}
-                    </span>
-                    <span className="inline-flex items-center gap-1 font-mono text-micro">
-                      {activeQuest.timerRunning ? (
-                        <>
-                          <span className="h-1.5 w-1.5 rounded-full bg-accent animate-ping" />
-                          <span className="text-accent/90">{t("questTimer.running", { defaultValue: "Em andamento" })}</span>
-                        </>
-                      ) : liveSeconds > 0 ? (
-                        <>
-                          <span className="h-1.5 w-1.5 rounded-full bg-amber-400" />
-                          <span className="text-amber-400/90">{t("questTimer.paused", { defaultValue: "Pausado" })}</span>
-                        </>
-                      ) : (
-                        <>
-                          <span className="h-1.5 w-1.5 rounded-full bg-foreground-muted/40" />
-                          <span className="text-foreground-muted/70">{t("questTimer.stopped", { defaultValue: "Parado" })}</span>
-                        </>
-                      )}
-                    </span>
-                  </div>
-                  <span className="font-flavor text-micro text-foreground-muted/60 tracking-wider uppercase block -mt-0.5">
-                    {t("questTimer.chronometer", { defaultValue: "Cronômetro de Jornada" })}
-                  </span>
-                </div>
+            <div className="my-2.5 flex items-center justify-between gap-3 rounded border border-border/30 bg-surface-muted/30 px-3 py-1.5 transition-colors">
+              <div className="flex items-center gap-2.5">
+                <img
+                  src={ampulhetaImg}
+                  alt="Ampulheta"
+                  className="h-6 w-6 object-contain select-none"
+                />
+                <span className="font-mono text-base font-semibold tracking-wider text-foreground">
+                  {formatDigitalTimer(liveSeconds)}
+                </span>
               </div>
 
               {activeQuest.status === "IN_PROGRESS" && (
                 <div className="flex items-center gap-1.5">
                   <button
                     type="button"
-                    className={`inline-flex items-center gap-1.5 rounded px-2.5 py-1 text-xs font-mono font-medium transition-colors ds-focus ${
+                    className={`inline-flex items-center gap-1 rounded px-2 py-0.5 text-xs font-mono font-medium transition-colors ds-focus ${
                       activeQuest.timerRunning
                         ? "border border-amber-500/40 text-amber-300 bg-amber-500/10 hover:bg-amber-500/20"
                         : "border border-accent/40 text-accent bg-accent/10 hover:bg-accent/20"
@@ -484,7 +462,7 @@ export default function QuestDetailModal({
                   {liveSeconds > 0 && (
                     <button
                       type="button"
-                      className="inline-flex items-center gap-1 rounded border border-border/40 px-2 py-1 text-xs font-mono text-foreground-muted hover:text-danger hover:border-danger/40 hover:bg-danger/5 transition-colors ds-focus"
+                      className="inline-flex items-center gap-1 rounded border border-border/40 px-1.5 py-0.5 text-xs font-mono text-foreground-muted hover:text-danger hover:border-danger/40 hover:bg-danger/5 transition-colors ds-focus"
                       title={t("questTimer.reset", { defaultValue: "Resetar cronômetro" })}
                       disabled={isUpdatingTimer || isBusy}
                       onClick={handleResetTimer}
