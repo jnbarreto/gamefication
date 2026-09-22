@@ -204,6 +204,8 @@ const en = {
     missionsProgress: "Missions {{completed}}/{{total}}",
     completeMissionsHint: "Complete all missions before finishing the quest.",
     noMissions: "No missions",
+    evidence: "Evidence",
+    evidenceTitle: "Completion Evidence",
   },
   questBoard: {
     title: "Quest board",

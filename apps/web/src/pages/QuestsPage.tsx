@@ -528,6 +528,20 @@ export default function QuestsPage() {
                         {t("quests.reopen", { defaultValue: "Reopen" })}
                       </button>
                     )}
+
+                    {quest.evidence?.value && (
+                      <a
+                        href={quest.evidence.value}
+                        target="_blank"
+                        rel="noreferrer noopener"
+                        className="text-xs font-mono text-accent hover:underline inline-flex items-center gap-1"
+                        title={quest.evidence.value}
+                      >
+                        <span>🔗</span>
+                        <span>{t("quests.evidence", { defaultValue: "Evidência" })}</span>
+                        <span className="text-[10px]">↗</span>
+                      </a>
+                    )}
                   </div>
                 </div>
 

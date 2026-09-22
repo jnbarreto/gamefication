@@ -204,6 +204,8 @@ const pt = {
     missionsProgress: "Missões {{completed}}/{{total}}",
     completeMissionsHint: "Conclua todas as missões para finalizar a quest.",
     noMissions: "Sem missões",
+    evidence: "Evidência",
+    evidenceTitle: "Evidência de Conclusão",
   },
   questBoard: {
     title: "Quadro de quests",

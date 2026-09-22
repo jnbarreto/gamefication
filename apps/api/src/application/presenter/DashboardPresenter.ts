@@ -53,6 +53,7 @@ export function presentDashboard(result: {
   calendarDay: string;
   todayQuests: Quest[];
   missionsByQuestId: Map<string, QuestMission[]>;
+  evidencesByQuestId?: Map<string, ReturnType<typeof import("./QuestPresenter.js").presentEvidence>>;
   topSkills: SkillTreeEntry[];
   recentTransactions: XpTransaction[];
   streak: Streak;
@@ -67,6 +68,7 @@ export function presentDashboard(result: {
       calendarDay: result.calendarDay,
       quests: result.todayQuests,
       missionsByQuestId: result.missionsByQuestId,
+      evidencesByQuestId: result.evidencesByQuestId,
     }).quests,
     topSkills: presentTopSkills(result.topSkills, result.referenceDate),
     recentTransactions: result.recentTransactions.map((transaction) =>

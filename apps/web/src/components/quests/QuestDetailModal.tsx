@@ -532,6 +532,31 @@ export default function QuestDetailModal({
           )
         )}
 
+        {!isEditing && activeQuest.evidence?.value && (
+          <div className="my-3 rounded border border-border/40 bg-surface-muted/30 p-2.5 space-y-1">
+            <span className="text-[11px] font-flavor font-medium uppercase tracking-wider text-foreground-muted block">
+              {t("quests.evidenceTitle", { defaultValue: "Evidência de Conclusão" })}
+            </span>
+            <div className="flex items-center gap-2">
+              <span className="text-accent text-xs select-none">🔗</span>
+              <a
+                href={activeQuest.evidence.value}
+                target="_blank"
+                rel="noreferrer noopener"
+                className="text-accent hover:underline break-all font-mono text-xs inline-flex items-center gap-1 ds-focus rounded"
+              >
+                <span>{activeQuest.evidence.value}</span>
+                <span className="text-[10px]">↗</span>
+              </a>
+            </div>
+            {activeQuest.evidence.description && (
+              <p className="text-micro text-foreground-muted italic pt-0.5">
+                {activeQuest.evidence.description}
+              </p>
+            )}
+          </div>
+        )}
+
         <div className="ds-quest-detail-modal__actions">
           {isEditing ? (
             <>

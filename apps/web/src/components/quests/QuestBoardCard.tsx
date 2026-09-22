@@ -264,12 +264,26 @@ export default function QuestBoardCard({
         )}
 
         {quest.status === "COMPLETED" && (
-          <Badge
-            variant="success"
-            className="w-full h-full flex items-center justify-center py-0"
-          >
-            {t(`enums.questStatus.${quest.status}`, { defaultValue: quest.status })}
-          </Badge>
+          <div className="flex w-full h-full items-center gap-1.5">
+            <Badge
+              variant="success"
+              className="flex-1 h-full flex items-center justify-center py-0"
+            >
+              {t(`enums.questStatus.${quest.status}`, { defaultValue: quest.status })}
+            </Badge>
+            {quest.evidence?.value && (
+              <a
+                href={quest.evidence.value}
+                target="_blank"
+                rel="noreferrer noopener"
+                className="inline-flex items-center justify-center h-full px-2.5 rounded border border-accent/40 bg-accent/10 text-accent hover:bg-accent/20 transition-colors text-xs font-mono ds-focus shrink-0"
+                title={`${t("quests.evidence", { defaultValue: "Evidência" })}: ${quest.evidence.value}`}
+                onClick={(e) => e.stopPropagation()}
+              >
+                <span>🔗</span>
+              </a>
+            )}
+          </div>
         )}
 
         {quest.status === "CANCELLED" && (

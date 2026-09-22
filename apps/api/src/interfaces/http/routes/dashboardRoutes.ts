@@ -7,6 +7,7 @@ import ListStaleSkills from "../../../application/usecase/skill/ListStaleSkills.
 import ListTodayQuests from "../../../application/usecase/quest/ListTodayQuests.js";
 import ListXpTransactions from "../../../application/usecase/xp/ListXpTransactions.js";
 import PostgresCharacterRepository from "../../../infrastructure/repository/PostgresCharacterRepository.js";
+import PostgresEvidenceRepository from "../../../infrastructure/repository/PostgresEvidenceRepository.js";
 import PostgresQuestMissionRepository from "../../../infrastructure/repository/PostgresQuestMissionRepository.js";
 import PostgresQuestRepository from "../../../infrastructure/repository/PostgresQuestRepository.js";
 import PostgresSkillRepository from "../../../infrastructure/repository/PostgresSkillRepository.js";
@@ -19,12 +20,19 @@ const timezone = process.env.TIMEZONE ?? "America/Sao_Paulo";
 const characterRepository = new PostgresCharacterRepository();
 const questRepository = new PostgresQuestRepository();
 const missionRepository = new PostgresQuestMissionRepository();
+const evidenceRepository = new PostgresEvidenceRepository();
 const skillRepository = new PostgresSkillRepository();
 const streakRepository = new PostgresStreakRepository();
 const xpTransactionRepository = new PostgresXpTransactionRepository();
 const getDashboard = new GetDashboard(
   new GetCharacter(characterRepository),
-  new ListTodayQuests(characterRepository, questRepository, missionRepository, timezone),
+  new ListTodayQuests(
+    characterRepository,
+    questRepository,
+    missionRepository,
+    timezone,
+    evidenceRepository,
+  ),
   new ListXpTransactions(characterRepository, xpTransactionRepository),
   new ListStaleSkills(characterRepository, skillRepository),
   streakRepository,

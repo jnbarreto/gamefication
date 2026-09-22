@@ -61,6 +61,11 @@ export type QuestResponse = {
   timerSeconds: number;
   timerRunning: boolean;
   timerStartedAt: string | null;
+  evidence?: {
+    type: string;
+    value: string;
+    description: string | null;
+  } | null;
   createdAt: string;
   updatedAt: string;
 };

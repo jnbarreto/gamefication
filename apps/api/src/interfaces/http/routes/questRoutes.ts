@@ -20,6 +20,7 @@ import UpdateQuestMission from "../../../application/usecase/quest/UpdateQuestMi
 import UpdateQuestTimer from "../../../application/usecase/quest/UpdateQuestTimer.js";
 import PostgresCharacterRepository from "../../../infrastructure/repository/PostgresCharacterRepository.js";
 import PostgresCharacterSkillRepository from "../../../infrastructure/repository/PostgresCharacterSkillRepository.js";
+import PostgresEvidenceRepository from "../../../infrastructure/repository/PostgresEvidenceRepository.js";
 import PostgresQuestCompletionRepository from "../../../infrastructure/repository/PostgresQuestCompletionRepository.js";
 import PostgresQuestMissionRepository from "../../../infrastructure/repository/PostgresQuestMissionRepository.js";
 import PostgresQuestRepository from "../../../infrastructure/repository/PostgresQuestRepository.js";
@@ -33,11 +34,14 @@ import { parseQuestIdParam } from "../validation/parseQuestIdParam.js";
 import { parseUpdateQuestBody } from "../validation/parseUpdateQuestBody.js";
 import { parseUpdateQuestMissionBody } from "../validation/parseUpdateQuestMissionBody.js";
 import { parseUpdateQuestTimerBody } from "../validation/parseUpdateQuestTimerBody.js";
+import { presentEvidence } from "../../../application/presenter/QuestPresenter.js";
+import type Quest from "../../../domain/quest/Quest.js";
 
 const timezone = process.env.TIMEZONE ?? "America/Sao_Paulo";
 const characterRepository = new PostgresCharacterRepository();
 const questRepository = new PostgresQuestRepository();
 const missionRepository = new PostgresQuestMissionRepository();
+const evidenceRepository = new PostgresEvidenceRepository();
 const characterSkillRepository = new PostgresCharacterSkillRepository();
 const streakRepository = new PostgresStreakRepository();
 const questCompletionRepository = new PostgresQuestCompletionRepository();
@@ -52,12 +56,14 @@ const listQuests = new ListQuests(
   questRepository,
   missionRepository,
   timezone,
+  evidenceRepository,
 );
 const listTodayQuests = new ListTodayQuests(
   characterRepository,
   questRepository,
   missionRepository,
   timezone,
+  evidenceRepository,
 );
 const completeQuest = new CompleteQuest(
   characterRepository,
@@ -88,6 +94,16 @@ const updateQuestMission = new UpdateQuestMission(
 const updateQuestTimer = new UpdateQuestTimer(characterRepository, questRepository);
 
 export function registerQuestRoutes(app: Express): void {
+  async function loadQuestPresentation(quest: Quest) {
+    const questId = quest.getId().toString();
+    const [missions, evidence] = await Promise.all([
+      missionRepository.findByQuestId(questId),
+      evidenceRepository.findByEntity("QUEST", questId),
+    ]);
+
+    return presentQuest(quest, missions, evidence ? presentEvidence(evidence) : null);
+  }
+
   app.get(
     "/api/v1/quests/today",
     asyncHandler(async (req, res) => {
@@ -103,7 +119,13 @@ export function registerQuestRoutes(app: Express): void {
       const query = parseListQuestsQuery(req.query);
       const result = await listQuests.execute(requireAuth(req).userId, query);
 
-      res.json(presentQuestList(result.quests, result.missionsByQuestId));
+      res.json(
+        presentQuestList(
+          result.quests,
+          result.missionsByQuestId,
+          result.evidencesByQuestId,
+        ),
+      );
     }),
   );
 
@@ -124,9 +146,8 @@ export function registerQuestRoutes(app: Express): void {
       const questId = parseQuestIdParam(req.params.id);
       const input = parseUpdateQuestBody(req.body);
       const quest = await updateQuest.execute(requireAuth(req).userId, questId, input);
-      const missions = await missionRepository.findByQuestId(questId);
 
-      res.json({ quest: presentQuest(quest, missions) });
+      res.json({ quest: await loadQuestPresentation(quest) });
     }),
   );
 
@@ -141,9 +162,8 @@ export function registerQuestRoutes(app: Express): void {
       const quest = await startQuest.execute(requireAuth(req).userId, questId, {
         startTimer,
       });
-      const missions = await missionRepository.findByQuestId(questId);
 
-      res.json({ quest: presentQuest(quest, missions) });
+      res.json({ quest: await loadQuestPresentation(quest) });
     }),
   );
 
@@ -157,9 +177,8 @@ export function registerQuestRoutes(app: Express): void {
         questId,
         input,
       );
-      const missions = await missionRepository.findByQuestId(questId);
 
-      res.json({ quest: presentQuest(quest, missions) });
+      res.json({ quest: await loadQuestPresentation(quest) });
     }),
   );
 
@@ -168,9 +187,8 @@ export function registerQuestRoutes(app: Express): void {
     asyncHandler(async (req, res) => {
       const questId = parseQuestIdParam(req.params.id);
       const quest = await cancelQuest.execute(requireAuth(req).userId, questId);
-      const missions = await missionRepository.findByQuestId(questId);
 
-      res.json({ quest: presentQuest(quest, missions) });
+      res.json({ quest: await loadQuestPresentation(quest) });
     }),
   );
 
@@ -179,9 +197,8 @@ export function registerQuestRoutes(app: Express): void {
     asyncHandler(async (req, res) => {
       const questId = parseQuestIdParam(req.params.id);
       const quest = await reopenQuest.execute(requireAuth(req).userId, questId);
-      const missions = await missionRepository.findByQuestId(questId);
 
-      res.json({ quest: presentQuest(quest, missions) });
+      res.json({ quest: await loadQuestPresentation(quest) });
     }),
   );
 
