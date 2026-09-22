@@ -12,7 +12,7 @@ export function loadEnv(): EnvConfig {
     throw new DatabaseConnectionError("DATABASE_URL environment variable is required");
   }
 
-  const port = Number(process.env.PORT ?? 3000);
+  const port = Number(process.env.PORT ?? 3001);
   if (Number.isNaN(port) || port <= 0) {
     throw new DatabaseConnectionError("PORT must be a positive number");
   }

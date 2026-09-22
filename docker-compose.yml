@@ -23,9 +23,9 @@ services:
       dockerfile: docker/Dockerfile.api
     container_name: gamefication-api
     ports:
-      - "3000:3000"
+      - "3001:3001"
     environment:
-      PORT: "3000"
+      PORT: "3001"
       DATABASE_URL: postgres://gamefication:gamefication@postgres:5432/gamefication
       TIMEZONE: America/Sao_Paulo
       JWT_SECRET: dev-jwt-secret-change-me
@@ -50,7 +50,7 @@ services:
     ports:
       - "5173:5173"
     environment:
-      VITE_PROXY_TARGET: http://api:3000
+      VITE_PROXY_TARGET: http://api:3001
     volumes:
       - ./apps/web/src:/app/apps/web/src
       - ./apps/web/index.html:/app/apps/web/index.html
