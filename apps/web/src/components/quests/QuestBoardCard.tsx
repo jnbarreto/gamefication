@@ -9,6 +9,7 @@ import { questReopenPillButtonClass } from "@/lib/quests/questStatusPill";
 type QuestBoardCardProps = {
   quest: QuestResponse;
   compact?: boolean;
+  hideMissions?: boolean;
   actionQuestId: string | null;
   startingQuestId?: string | null;
   onOpenDetail: () => void;
@@ -50,6 +51,7 @@ function MissionPreviewRow({ title, isCompleted }: MissionPreviewRowProps) {
 export default function QuestBoardCard({
   quest,
   compact = false,
+  hideMissions = false,
   actionQuestId,
   startingQuestId = null,
   onOpenDetail,
@@ -76,7 +78,7 @@ export default function QuestBoardCard({
 
   return (
     <article
-      className={`${questItemClass(quest.status, quest.type)} ds-quest-board-card ds-quest-board-card--fixed ${compact ? "ds-quest-board-card--compact" : ""}`}
+      className={`${questItemClass(quest.status, quest.type)} ds-quest-board-card ${hideMissions ? "ds-quest-board-card--no-missions" : "ds-quest-board-card--fixed"} ${compact ? "ds-quest-board-card--compact" : ""}`}
       onClick={handleCardClick}
       onKeyDown={handleCardKeyDown}
       role="button"
@@ -123,38 +125,40 @@ export default function QuestBoardCard({
         </p>
       </header>
 
-      {missionTotal > 0 ? (
-        <div className="ds-quest-board-card__missions ds-quest-board-card__missions--preview">
-          <div className="mb-1.5 flex shrink-0 items-center justify-between gap-1">
-            <p className="ds-quest-board-card__missions-label mb-0">
-              {t("quests.missionsProgress", {
-                completed: missionDone,
-                total: missionTotal,
-              })}
-            </p>
-            {missionTotal > 3 && (
-              <span className="text-micro font-mono text-foreground-muted/60 shrink-0">
-                +{missionTotal - 3}
-              </span>
-            )}
+      {!hideMissions && (
+        missionTotal > 0 ? (
+          <div className="ds-quest-board-card__missions ds-quest-board-card__missions--preview">
+            <div className="mb-1.5 flex shrink-0 items-center justify-between gap-1">
+              <p className="ds-quest-board-card__missions-label mb-0">
+                {t("quests.missionsProgress", {
+                  completed: missionDone,
+                  total: missionTotal,
+                })}
+              </p>
+              {missionTotal > 3 && (
+                <span className="text-micro font-mono text-foreground-muted/60 shrink-0">
+                  +{missionTotal - 3}
+                </span>
+              )}
+            </div>
+            <ul className="ds-quest-board-card__mission-list ds-quest-board-card__mission-list--preview">
+              {quest.missions.map((mission) => (
+                <li key={mission.id}>
+                  <MissionPreviewRow
+                    title={mission.title}
+                    isCompleted={mission.isCompleted}
+                  />
+                </li>
+              ))}
+            </ul>
           </div>
-          <ul className="ds-quest-board-card__mission-list ds-quest-board-card__mission-list--preview">
-            {quest.missions.map((mission) => (
-              <li key={mission.id}>
-                <MissionPreviewRow
-                  title={mission.title}
-                  isCompleted={mission.isCompleted}
-                />
-              </li>
-            ))}
-          </ul>
-        </div>
-      ) : (
-        <div className="ds-quest-board-card__missions ds-quest-board-card__missions--empty">
-          <p className="ds-quest-board-card__missions-empty-text">
-            {t("quests.noMissions", { defaultValue: "Sem missões" })}
-          </p>
-        </div>
+        ) : (
+          <div className="ds-quest-board-card__missions ds-quest-board-card__missions--empty">
+            <p className="ds-quest-board-card__missions-empty-text">
+              {t("quests.noMissions", { defaultValue: "Sem missões" })}
+            </p>
+          </div>
+        )
       )}
 
       <footer

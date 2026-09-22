@@ -30,3 +30,15 @@
     @apply rounded-panel bg-surface-muted px-1 py-0.5 font-mono text-small;
   }
 }
+
+@layer utilities {
+  * {
+    scrollbar-width: none;
+    -ms-overflow-style: none;
+  }
+
+  *::-webkit-scrollbar {
+    display: none;
+  }
+}
+

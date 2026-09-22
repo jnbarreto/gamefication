@@ -59,6 +59,38 @@ export default function QuestBoardAddPanel({
 }: QuestBoardAddPanelProps) {
   const { t } = useTranslation();
   const containerRef = useRef<HTMLDivElement>(null);
+  const listRef = useRef<HTMLUListElement>(null);
+  const isMouseDownRef = useRef(false);
+  const startXRef = useRef(0);
+  const startScrollLeftRef = useRef(0);
+  const isDragMovedRef = useRef(false);
+
+  function handleMouseDown(e: React.MouseEvent<HTMLUListElement>) {
+    if (e.button !== 0) return;
+    if (!listRef.current) return;
+    isMouseDownRef.current = true;
+    startXRef.current = e.pageX;
+    startScrollLeftRef.current = listRef.current.scrollLeft;
+    isDragMovedRef.current = false;
+  }
+
+  function handleMouseMove(e: React.MouseEvent<HTMLUListElement>) {
+    if (!isMouseDownRef.current || !listRef.current) return;
+    const dx = e.pageX - startXRef.current;
+    if (Math.abs(dx) > 4) {
+      isDragMovedRef.current = true;
+    }
+    listRef.current.scrollLeft = startScrollLeftRef.current - dx;
+  }
+
+  function handleMouseUp() {
+    isMouseDownRef.current = false;
+  }
+
+  function handleMouseLeave() {
+    isMouseDownRef.current = false;
+  }
+
   const [open, setOpen] = useState(false);
   const [searchQuery, setSearchQuery] = useState("");
   const [typeFilter, setTypeFilter] = useState<FilterValue>("ALL");
@@ -241,32 +273,42 @@ export default function QuestBoardAddPanel({
           ) : filteredQuests.length === 0 ? (
             <p className="ds-empty">{t("questBoard.searchQuestsEmpty")}</p>
           ) : (
-            <ul className="ds-quest-board-add__list">
+            <ul
+              ref={listRef}
+              className="ds-quest-board-add__list"
+              onMouseDown={handleMouseDown}
+              onMouseMove={handleMouseMove}
+              onMouseUp={handleMouseUp}
+              onMouseLeave={handleMouseLeave}
+            >
               {filteredQuests.map((quest) => (
-                <li key={quest.id} className="ds-quest-board-add__item">
-                  <div className="min-w-0">
-                    <p className="ds-quest-board-add__title">{quest.title}</p>
-                    <p className="ds-quest-board-add__meta">
-                      {t(`enums.questStatus.${quest.status}`, {
-                        defaultValue: quest.status,
-                      })}{" "}
-                      · {quest.type} · {quest.difficulty}
-                      {quest.skillAllocations[0] && (
-                        <>
-                          {" "}
-                          ·{" "}
-                          {skillLabelById.get(quest.skillAllocations[0]!.skillId) ??
-                            quest.skillAllocations[0]!.skillId}
-                        </>
-                      )}
-                    </p>
-                  </div>
+                <li key={quest.id}>
                   <button
                     type="button"
-                    className="ds-quest-board-add__btn ds-focus"
-                    onClick={() => onAddQuest(quest.id)}
+                    className="ds-quest-board-add__item ds-focus min-w-full w-max text-left"
+                    onClick={() => {
+                      if (!isDragMovedRef.current) {
+                        onAddQuest(quest.id);
+                      }
+                    }}
                   >
-                    {t("questBoard.addToBoard")}
+                    <div className="min-w-max">
+                      <p className="ds-quest-board-add__title">{quest.title}</p>
+                      <p className="ds-quest-board-add__meta">
+                        {t(`enums.questStatus.${quest.status}`, {
+                          defaultValue: quest.status,
+                        })}{" "}
+                        · {quest.type} · {quest.difficulty}
+                        {quest.skillAllocations[0] && (
+                          <>
+                            {" "}
+                            ·{" "}
+                            {skillLabelById.get(quest.skillAllocations[0]!.skillId) ??
+                              quest.skillAllocations[0]!.skillId}
+                          </>
+                        )}
+                      </p>
+                    </div>
                   </button>
                 </li>
               ))}

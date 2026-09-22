@@ -11,6 +11,7 @@ import QuestDetailModal from "./QuestDetailModal";
 type QuestKanbanViewProps = {
   quests: QuestResponse[];
   showCancelled: boolean;
+  hideMissions?: boolean;
   actionQuestId: string | null;
   togglingMissionId: string | null;
   showEvidenceForId: string | null;
@@ -33,6 +34,7 @@ const KANBAN_COLUMNS = ["TODO", "IN_PROGRESS", "COMPLETED"] as const;
 export default function QuestKanbanView({
   quests,
   showCancelled,
+  hideMissions = false,
   actionQuestId,
   togglingMissionId,
   showEvidenceForId,
@@ -106,6 +108,7 @@ export default function QuestKanbanView({
                     key={quest.id}
                     quest={quest}
                     compact
+                    hideMissions={hideMissions}
                     actionQuestId={actionQuestId}
                     onOpenDetail={() => setDetailQuestId(quest.id)}
                     onStart={onStart}
@@ -133,6 +136,7 @@ export default function QuestKanbanView({
                 key={quest.id}
                 quest={quest}
                 compact
+                hideMissions={hideMissions}
                 actionQuestId={actionQuestId}
                 onOpenDetail={() => setDetailQuestId(quest.id)}
                 onStart={onStart}

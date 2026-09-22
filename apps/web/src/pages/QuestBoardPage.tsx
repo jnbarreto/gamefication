@@ -2,6 +2,7 @@ import { useCallback, useEffect, useMemo, useState } from "react";
 import { useTranslation } from "react-i18next";
 
 import QuestBoardAddPanel from "@/components/quests/QuestBoardAddPanel";
+import QuestBoardSelector from "@/components/quests/QuestBoardSelector";
 import QuestCardsView from "@/components/quests/QuestCardsView";
 import QuestKanbanView from "@/components/quests/QuestKanbanView";
 import QuestRoadmapView from "@/components/quests/QuestRoadmapView";
@@ -19,7 +20,7 @@ import {
 import { fetchSkillTree } from "@/lib/api/skills";
 import type { QuestResponse, SkillCategoryResponse } from "@/lib/api/types";
 import { useConfirm } from "@/lib/confirm/ConfirmDialogProvider";
-import { useQuestBoardSelection } from "@/lib/quests/questBoardSelection";
+import { useQuestBoards } from "@/lib/quests/questBoardSelection";
 
 type BoardView = "kanban" | "roadmap" | "cards";
 
@@ -50,7 +51,18 @@ export default function QuestBoardPage() {
   const [showEvidenceForId, setShowEvidenceForId] = useState<string | null>(null);
   const [evidenceUrl, setEvidenceUrl] = useState("");
 
-  const { selectedIdSet, addQuest, removeQuest, pruneMissing } = useQuestBoardSelection();
+  const {
+    boards,
+    activeBoardId,
+    selectedIdSet,
+    setActiveBoardId,
+    createBoard,
+    renameBoard,
+    deleteBoard,
+    addQuest,
+    removeQuest,
+    pruneMissing,
+  } = useQuestBoards();
 
   const loadQuests = useCallback(async () => {
     const result = await fetchQuests({ period: "last30days" });
@@ -263,6 +275,7 @@ export default function QuestBoardPage() {
 
   const sharedViewProps = {
     quests: boardQuests,
+    hideMissions: true,
     actionQuestId,
     togglingMissionId,
     showEvidenceForId,
@@ -294,6 +307,15 @@ export default function QuestBoardPage() {
         <h2 className="text-2xl font-semibold">{t("questBoard.title")}</h2>
         <p className="mt-2 text-foreground-muted">{t("questBoard.subtitle")}</p>
       </div>
+
+      <QuestBoardSelector
+        boards={boards}
+        activeBoardId={activeBoardId}
+        onSelectBoard={setActiveBoardId}
+        onCreateBoard={createBoard}
+        onRenameBoard={renameBoard}
+        onDeleteBoard={deleteBoard}
+      />
 
       {actionError && <div className="ds-error">{actionError}</div>}
 
