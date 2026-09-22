@@ -226,6 +226,13 @@ export function useQuestBoards() {
         return id;
       });
 
+      while (reorderedIndex < reorderedColumnQuestIds.length) {
+        const remainingId = reorderedColumnQuestIds[reorderedIndex++];
+        if (remainingId && !nextQuestIds.includes(remainingId)) {
+          nextQuestIds.push(remainingId);
+        }
+      }
+
       return {
         ...current,
         boards: current.boards.map((b) =>

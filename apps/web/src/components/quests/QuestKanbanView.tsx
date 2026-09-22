@@ -1,4 +1,4 @@
-import { useMemo, useState } from "react";
+import { useMemo, useRef, useState } from "react";
 import { useTranslation } from "react-i18next";
 
 import type { UpdateQuestRequest } from "@/lib/api/quests";
@@ -61,6 +61,7 @@ export default function QuestKanbanView({
   const [draggedStatus, setDraggedStatus] = useState<string | null>(null);
   const [dragOverQuestId, setDragOverQuestId] = useState<string | null>(null);
   const [dropPosition, setDropPosition] = useState<"above" | "below" | null>(null);
+  const dragStateRef = useRef<{ id: string; status: string } | null>(null);
 
   const questsByStatus = useMemo(() => {
     const grouped = new Map<string, QuestResponse[]>();
@@ -81,11 +82,13 @@ export default function QuestKanbanView({
   function handleCardDragStart(quest: QuestResponse, event: React.DragEvent<HTMLElement>) {
     event.dataTransfer.effectAllowed = "move";
     event.dataTransfer.setData("text/plain", quest.id);
+    dragStateRef.current = { id: quest.id, status: quest.status };
     setDraggedQuestId(quest.id);
     setDraggedStatus(quest.status);
   }
 
   function handleCardDragEnd() {
+    dragStateRef.current = null;
     setDraggedQuestId(null);
     setDraggedStatus(null);
     setDragOverQuestId(null);
@@ -93,8 +96,9 @@ export default function QuestKanbanView({
   }
 
   function handleCardDragOver(quest: QuestResponse, event: React.DragEvent<HTMLElement>) {
+    const currentDrag = dragStateRef.current;
     // CRITICAL: ONLY allow dragging within the SAME column!
-    if (draggedStatus !== quest.status || draggedQuestId === quest.id) {
+    if (!currentDrag || currentDrag.status !== quest.status || currentDrag.id === quest.id) {
       return;
     }
     event.preventDefault();
@@ -109,7 +113,10 @@ export default function QuestKanbanView({
     setDropPosition(position);
   }
 
-  function handleCardDragLeave(quest: QuestResponse) {
+  function handleCardDragLeave(quest: QuestResponse, event: React.DragEvent<HTMLElement>) {
+    if (event.currentTarget.contains(event.relatedTarget as Node)) {
+      return;
+    }
     if (dragOverQuestId === quest.id) {
       setDragOverQuestId(null);
       setDropPosition(null);
@@ -120,11 +127,15 @@ export default function QuestKanbanView({
     event.preventDefault();
     event.stopPropagation();
 
+    const currentDrag = dragStateRef.current;
+    const draggedId = currentDrag?.id ?? draggedQuestId;
+    const currentStatus = currentDrag?.status ?? draggedStatus;
+
     // ONLY allow reordering within the same column!
     if (
-      !draggedQuestId ||
-      draggedStatus !== targetQuest.status ||
-      draggedQuestId === targetQuest.id
+      !draggedId ||
+      currentStatus !== targetQuest.status ||
+      draggedId === targetQuest.id
     ) {
       handleCardDragEnd();
       return;
@@ -132,24 +143,29 @@ export default function QuestKanbanView({
 
     const columnQuests = questsByStatus.get(targetQuest.status) ?? [];
     const currentIds = columnQuests.map((q) => q.id);
-    const fromIndex = currentIds.indexOf(draggedQuestId);
+    const fromIndex = currentIds.indexOf(draggedId);
     if (fromIndex === -1) {
       handleCardDragEnd();
       return;
     }
 
-    const newIds = currentIds.filter((id) => id !== draggedQuestId);
+    const rect = event.currentTarget.getBoundingClientRect();
+    const midY = rect.top + rect.height / 2;
+    const isBelow = event.clientY >= midY;
+
+    const newIds = currentIds.filter((id) => id !== draggedId);
     const targetIndex = newIds.indexOf(targetQuest.id);
-    const insertIndex = dropPosition === "below" ? targetIndex + 1 : targetIndex;
-    newIds.splice(insertIndex, 0, draggedQuestId);
+    const insertIndex = isBelow ? targetIndex + 1 : targetIndex;
+    newIds.splice(insertIndex, 0, draggedId);
 
     onReorderQuests?.(newIds);
     handleCardDragEnd();
   }
 
   function handleColumnDragOver(status: string, event: React.DragEvent<HTMLElement>) {
+    const currentDrag = dragStateRef.current;
     // ONLY allow drag-over if dragging a card from THIS SAME column
-    if (draggedStatus === status) {
+    if ((currentDrag && currentDrag.status === status) || draggedStatus === status) {
       event.preventDefault();
       event.dataTransfer.dropEffect = "move";
     }
@@ -157,17 +173,21 @@ export default function QuestKanbanView({
 
   function handleColumnDrop(status: string, event: React.DragEvent<HTMLElement>) {
     event.preventDefault();
-    if (draggedStatus !== status || !draggedQuestId) {
+    const currentDrag = dragStateRef.current;
+    const draggedId = currentDrag?.id ?? draggedQuestId;
+    const currentStatus = currentDrag?.status ?? draggedStatus;
+
+    if (currentStatus !== status || !draggedId) {
       handleCardDragEnd();
       return;
     }
 
     const columnQuests = questsByStatus.get(status) ?? [];
     const currentIds = columnQuests.map((q) => q.id);
-    const fromIndex = currentIds.indexOf(draggedQuestId);
+    const fromIndex = currentIds.indexOf(draggedId);
     if (fromIndex !== -1 && fromIndex !== currentIds.length - 1) {
-      const newIds = currentIds.filter((id) => id !== draggedQuestId);
-      newIds.push(draggedQuestId);
+      const newIds = currentIds.filter((id) => id !== draggedId);
+      newIds.push(draggedId);
       onReorderQuests?.(newIds);
     }
 
@@ -218,7 +238,7 @@ export default function QuestKanbanView({
                     onDragStart={(e) => handleCardDragStart(quest, e)}
                     onDragEnd={handleCardDragEnd}
                     onDragOver={(e) => handleCardDragOver(quest, e)}
-                    onDragLeave={() => handleCardDragLeave(quest)}
+                    onDragLeave={(e) => handleCardDragLeave(quest, e)}
                     onDrop={(e) => handleCardDrop(quest, e)}
                     isDragging={draggedQuestId === quest.id}
                     dropPosition={dragOverQuestId === quest.id ? dropPosition : null}
@@ -258,7 +278,7 @@ export default function QuestKanbanView({
                 onDragStart={(e) => handleCardDragStart(quest, e)}
                 onDragEnd={handleCardDragEnd}
                 onDragOver={(e) => handleCardDragOver(quest, e)}
-                onDragLeave={() => handleCardDragLeave(quest)}
+                onDragLeave={(e) => handleCardDragLeave(quest, e)}
                 onDrop={(e) => handleCardDrop(quest, e)}
                 isDragging={draggedQuestId === quest.id}
                 dropPosition={dragOverQuestId === quest.id ? dropPosition : null}

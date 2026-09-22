@@ -90,6 +90,11 @@ export default function QuestBoardCard({
   }
 
   function handleInternalDragStart(event: React.DragEvent<HTMLElement>) {
+    const target = event.target as HTMLElement;
+    if (target.closest("button") || target.closest("input") || target.closest("a")) {
+      event.preventDefault();
+      return;
+    }
     isDragActionRef.current = true;
     onDragStart?.(event);
   }
@@ -97,7 +102,7 @@ export default function QuestBoardCard({
   function handleInternalDragEnd(event: React.DragEvent<HTMLElement>) {
     setTimeout(() => {
       isDragActionRef.current = false;
-    }, 100);
+    }, 150);
     onDragEnd?.(event);
   }
 
@@ -116,7 +121,7 @@ export default function QuestBoardCard({
       onDragOver={onDragOver}
       onDragLeave={onDragLeave}
       onDrop={onDrop}
-      className={`${questItemClass(quest.status, quest.type)} ds-quest-board-card ${hideMissions ? "ds-quest-board-card--no-missions" : "ds-quest-board-card--fixed"} ${compact ? "ds-quest-board-card--compact" : ""} ${draggable ? "cursor-grab active:cursor-grabbing" : ""} ${isDragging ? "opacity-30 scale-[0.98] pointer-events-none" : ""} ${dropPosition === "above" ? "border-t-2 !border-t-accent shadow-[0_-3px_10px_rgba(0,255,102,0.35)]" : ""} ${dropPosition === "below" ? "border-b-2 !border-b-accent shadow-[0_3px_10px_rgba(0,255,102,0.35)]" : ""}`}
+      className={`${questItemClass(quest.status, quest.type)} ds-quest-board-card ${hideMissions ? "ds-quest-board-card--no-missions" : "ds-quest-board-card--fixed"} ${compact ? "ds-quest-board-card--compact" : ""} ${draggable ? "cursor-grab active:cursor-grabbing select-none" : ""} ${isDragging ? "opacity-40" : ""} ${dropPosition === "above" ? "!border-t-2 !border-t-accent shadow-[0_-3px_10px_rgba(0,255,102,0.35)]" : ""} ${dropPosition === "below" ? "!border-b-2 !border-b-accent shadow-[0_3px_10px_rgba(0,255,102,0.35)]" : ""}`}
       onClick={handleCardClick}
       onKeyDown={handleCardKeyDown}
       role="button"
