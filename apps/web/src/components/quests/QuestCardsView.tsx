@@ -10,6 +10,7 @@ import QuestDetailModal from "./QuestDetailModal";
 type QuestCardsViewProps = {
   quests: QuestResponse[];
   maxCards?: number;
+  hideMissions?: boolean;
   actionQuestId: string | null;
   startingQuestId?: string | null;
   togglingMissionId: string | null;
@@ -31,6 +32,7 @@ type QuestCardsViewProps = {
 export default function QuestCardsView({
   quests,
   maxCards,
+  hideMissions = false,
   actionQuestId,
   startingQuestId = null,
   togglingMissionId,
@@ -65,6 +67,7 @@ export default function QuestCardsView({
           <QuestBoardCard
             key={quest.id}
             quest={quest}
+            hideMissions={hideMissions}
             actionQuestId={actionQuestId}
             startingQuestId={startingQuestId}
             onOpenDetail={() => {

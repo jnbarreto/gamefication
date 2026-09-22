@@ -1,28 +1,36 @@
-import { type KeyboardEvent } from "react";
+import { useRef, type KeyboardEvent } from "react";
 import { useTranslation } from "react-i18next";
 
 import { Badge, questItemClass } from "@/components/design";
 import type { QuestResponse } from "@/lib/api/types";
 import { completedMissionCount } from "@/lib/quests/questMissionProgress";
 import { questReopenPillButtonClass } from "@/lib/quests/questStatusPill";
+import { LinkifiedText } from "../ui/LinkifiedText";
 
 type QuestBoardCardProps = {
   quest: QuestResponse;
   compact?: boolean;
+  hideMissions?: boolean;
   actionQuestId: string | null;
   startingQuestId?: string | null;
   onOpenDetail: () => void;
   onStart: (questId: string) => void;
   onReopen?: (questId: string) => void;
   onRemoveFromBoard?: (questId: string) => void;
+  draggable?: boolean;
+  onDragStart?: (event: React.DragEvent<HTMLElement>) => void;
+  onDragEnd?: (event: React.DragEvent<HTMLElement>) => void;
+  onDragOver?: (event: React.DragEvent<HTMLElement>) => void;
+  onDragLeave?: (event: React.DragEvent<HTMLElement>) => void;
+  onDrop?: (event: React.DragEvent<HTMLElement>) => void;
+  isDragging?: boolean;
+  dropPosition?: "above" | "below" | null;
 };
 
 type MissionPreviewRowProps = {
   title: string;
   isCompleted: boolean;
 };
-
-import { LinkifiedText } from "../ui/LinkifiedText";
 
 function MissionPreviewRow({ title, isCompleted }: MissionPreviewRowProps) {
   return (
@@ -50,21 +58,52 @@ function MissionPreviewRow({ title, isCompleted }: MissionPreviewRowProps) {
 export default function QuestBoardCard({
   quest,
   compact = false,
+  hideMissions = false,
   actionQuestId,
   startingQuestId = null,
   onOpenDetail,
   onStart,
   onReopen,
   onRemoveFromBoard,
+  draggable = false,
+  onDragStart,
+  onDragEnd,
+  onDragOver,
+  onDragLeave,
+  onDrop,
+  isDragging = false,
+  dropPosition = null,
 }: QuestBoardCardProps) {
   const { t } = useTranslation();
+  const isDragActionRef = useRef(false);
   const isStarting = startingQuestId === quest.id;
   const isBusy = actionQuestId === quest.id;
   const missionTotal = quest.missions.length;
   const missionDone = completedMissionCount(quest);
 
   function handleCardClick() {
+    if (isDragging || isDragActionRef.current) {
+      isDragActionRef.current = false;
+      return;
+    }
     onOpenDetail();
+  }
+
+  function handleInternalDragStart(event: React.DragEvent<HTMLElement>) {
+    const target = event.target as HTMLElement;
+    if (target.closest("button") || target.closest("input") || target.closest("a")) {
+      event.preventDefault();
+      return;
+    }
+    isDragActionRef.current = true;
+    onDragStart?.(event);
+  }
+
+  function handleInternalDragEnd(event: React.DragEvent<HTMLElement>) {
+    setTimeout(() => {
+      isDragActionRef.current = false;
+    }, 150);
+    onDragEnd?.(event);
   }
 
   function handleCardKeyDown(event: KeyboardEvent<HTMLElement>) {
@@ -76,7 +115,13 @@ export default function QuestBoardCard({
 
   return (
     <article
-      className={`${questItemClass(quest.status, quest.type)} ds-quest-board-card ds-quest-board-card--fixed ${compact ? "ds-quest-board-card--compact" : ""}`}
+      draggable={draggable}
+      onDragStart={handleInternalDragStart}
+      onDragEnd={handleInternalDragEnd}
+      onDragOver={onDragOver}
+      onDragLeave={onDragLeave}
+      onDrop={onDrop}
+      className={`${questItemClass(quest.status, quest.type)} ds-quest-board-card ${hideMissions ? "ds-quest-board-card--no-missions" : "ds-quest-board-card--fixed"} ${compact ? "ds-quest-board-card--compact" : ""} ${draggable ? "cursor-grab active:cursor-grabbing select-none" : ""} ${isDragging ? "opacity-40" : ""} ${dropPosition === "above" ? "!border-t-2 !border-t-accent shadow-[0_-3px_10px_rgba(0,255,102,0.35)]" : ""} ${dropPosition === "below" ? "!border-b-2 !border-b-accent shadow-[0_3px_10px_rgba(0,255,102,0.35)]" : ""}`}
       onClick={handleCardClick}
       onKeyDown={handleCardKeyDown}
       role="button"
@@ -123,38 +168,40 @@ export default function QuestBoardCard({
         </p>
       </header>
 
-      {missionTotal > 0 ? (
-        <div className="ds-quest-board-card__missions ds-quest-board-card__missions--preview">
-          <div className="mb-1.5 flex shrink-0 items-center justify-between gap-1">
-            <p className="ds-quest-board-card__missions-label mb-0">
-              {t("quests.missionsProgress", {
-                completed: missionDone,
-                total: missionTotal,
-              })}
-            </p>
-            {missionTotal > 3 && (
-              <span className="text-micro font-mono text-foreground-muted/60 shrink-0">
-                +{missionTotal - 3}
-              </span>
-            )}
+      {!hideMissions && (
+        missionTotal > 0 ? (
+          <div className="ds-quest-board-card__missions ds-quest-board-card__missions--preview">
+            <div className="mb-1.5 flex shrink-0 items-center justify-between gap-1">
+              <p className="ds-quest-board-card__missions-label mb-0">
+                {t("quests.missionsProgress", {
+                  completed: missionDone,
+                  total: missionTotal,
+                })}
+              </p>
+              {missionTotal > 3 && (
+                <span className="text-micro font-mono text-foreground-muted/60 shrink-0">
+                  +{missionTotal - 3}
+                </span>
+              )}
+            </div>
+            <ul className="ds-quest-board-card__mission-list ds-quest-board-card__mission-list--preview">
+              {quest.missions.map((mission) => (
+                <li key={mission.id}>
+                  <MissionPreviewRow
+                    title={mission.title}
+                    isCompleted={mission.isCompleted}
+                  />
+                </li>
+              ))}
+            </ul>
           </div>
-          <ul className="ds-quest-board-card__mission-list ds-quest-board-card__mission-list--preview">
-            {quest.missions.map((mission) => (
-              <li key={mission.id}>
-                <MissionPreviewRow
-                  title={mission.title}
-                  isCompleted={mission.isCompleted}
-                />
-              </li>
-            ))}
-          </ul>
-        </div>
-      ) : (
-        <div className="ds-quest-board-card__missions ds-quest-board-card__missions--empty">
-          <p className="ds-quest-board-card__missions-empty-text">
-            {t("quests.noMissions", { defaultValue: "Sem missões" })}
-          </p>
-        </div>
+        ) : (
+          <div className="ds-quest-board-card__missions ds-quest-board-card__missions--empty">
+            <p className="ds-quest-board-card__missions-empty-text">
+              {t("quests.noMissions", { defaultValue: "Sem missões" })}
+            </p>
+          </div>
+        )
       )}
 
       <footer

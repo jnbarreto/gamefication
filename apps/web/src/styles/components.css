@@ -980,6 +980,48 @@
     @apply grid gap-4;
   }
 
+  .ds-quest-board__boards-bar {
+    @apply flex items-center overflow-x-auto pb-1;
+    scrollbar-width: none;
+    -ms-overflow-style: none;
+  }
+
+  .ds-quest-board__boards-bar::-webkit-scrollbar {
+    display: none;
+  }
+
+  .ds-quest-board__boards-list {
+    @apply flex items-center gap-2;
+  }
+
+  .ds-quest-board__board-tab {
+    @apply flex items-center rounded-panel border border-border/25 bg-surface text-foreground-muted transition-colors hover:border-border/40 hover:text-foreground;
+  }
+
+  .ds-quest-board__board-tab--active {
+    @apply border-accent/60 bg-accent/10 text-accent font-medium;
+  }
+
+  .ds-quest-board__board-tab-btn {
+    @apply flex items-center gap-2 px-3 py-1.5 text-small text-inherit;
+  }
+
+  .ds-quest-board__board-count {
+    @apply rounded-full bg-base/50 px-1.5 py-0.5 text-micro;
+  }
+
+  .ds-quest-board__board-action-btn {
+    @apply flex h-6 w-6 items-center justify-center rounded-panel text-foreground-muted transition-colors hover:bg-base/40 hover:text-foreground;
+  }
+
+  .ds-quest-board__board-action-btn--danger {
+    @apply hover:text-danger;
+  }
+
+  .ds-quest-board__new-board-btn {
+    @apply flex shrink-0 items-center gap-1.5 rounded-panel border border-dashed border-border/30 bg-base/20 px-3 py-1.5 text-small text-foreground-muted transition-colors hover:border-accent/40 hover:text-accent;
+  }
+
   .ds-quest-board__toolbar {
     @apply sticky top-4 z-10 flex flex-wrap items-center justify-between gap-3 rounded-panel border border-border/20 bg-surface/95 p-2.5 backdrop-blur-sm;
     box-shadow:
@@ -1041,6 +1083,10 @@
 
   .ds-quest-board-card--fixed {
     @apply h-[18.5rem] max-h-[18.5rem] cursor-pointer transition-colors duration-fast ease-out hover:border-accent/35;
+  }
+
+  .ds-quest-board-card--no-missions {
+    @apply min-h-[7.5rem] cursor-pointer transition-colors duration-fast ease-out hover:border-accent/35;
   }
 
   .ds-quest-board-card--compact {
@@ -1348,19 +1394,25 @@
   }
 
   .ds-quest-board-add__list {
-    @apply grid max-h-72 gap-2 overflow-y-auto;
+    @apply grid max-h-72 gap-2 overflow-y-auto overflow-x-auto;
+    scrollbar-width: none;
+    -ms-overflow-style: none;
+  }
+
+  .ds-quest-board-add__list::-webkit-scrollbar {
+    display: none;
   }
 
   .ds-quest-board-add__item {
-    @apply flex items-center justify-between gap-3 rounded-panel border border-border/20 bg-surface-muted/30 p-2.5;
+    @apply flex items-center justify-between gap-3 rounded-panel border border-border/20 bg-surface-muted/30 p-2.5 text-left transition-colors duration-fast ease-out hover:border-accent/40 hover:bg-surface-muted/60 cursor-pointer select-none;
   }
 
   .ds-quest-board-add__title {
-    @apply truncate text-small font-medium text-foreground;
+    @apply whitespace-nowrap text-small font-medium text-foreground;
   }
 
   .ds-quest-board-add__meta {
-    @apply truncate text-micro text-foreground-muted;
+    @apply whitespace-nowrap text-micro text-foreground-muted;
   }
 
   .ds-quest-board-add__btn {
