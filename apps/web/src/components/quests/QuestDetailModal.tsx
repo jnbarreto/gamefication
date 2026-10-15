@@ -487,17 +487,17 @@ export default function QuestDetailModal({
           </div>
         ) : (
           activeQuest.missions.length > 0 && (
-            <div className="ds-quest-board-card__missions ds-quest-detail-modal__missions">
-              <p className="ds-quest-board-card__missions-label">
+            <div className="ds-quest-detail-modal__missions">
+              <p className="ds-quest-detail-modal__missions-label">
                 {t("quests.missionsProgress", {
                   completed: missionDone,
                   total: activeQuest.missions.length,
                 })}
               </p>
-              <ul className="ds-quest-board-card__mission-list">
+              <ul className="ds-quest-detail-modal__mission-list">
                 {activeQuest.missions.map((mission) => (
                   <li key={mission.id}>
-                    <label className="ds-quest-board-card__mission">
+                    <label className="ds-quest-detail-modal__mission">
                       <input
                         type="checkbox"
                         checked={mission.isCompleted}

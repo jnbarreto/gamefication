@@ -359,11 +359,11 @@ function DashboardContent({
       />
 
       <div className="grid gap-6 lg:grid-cols-2">
-        <Panel title={t("dashboard.topSkills")} className="ds-panel--compact">
+        <Panel title={t("dashboard.topSkills")} className="ds-panel--compact h-full">
           {topSkills.length === 0 ? (
             <EmptyState message={t("dashboard.noSkillProgress")} />
           ) : (
-            <ul className="ds-skill-highlight-list">
+            <ul className="ds-skill-highlight-list flex-1">
               {topSkills.map((skill) => (
                 <li key={skill.id} className="ds-skill-highlight">
                   <div className="ds-skill-highlight__head">
@@ -389,17 +389,20 @@ function DashboardContent({
           )}
         </Panel>
 
-        <Panel title={t("dashboard.recentXp")} className="ds-panel--compact">
+        <Panel title={t("dashboard.recentXp")} className="ds-panel--compact h-full">
           {recentTransactions.length === 0 ? (
             <EmptyState message={t("dashboard.noTransactions")} />
           ) : (
-            <div className="ds-scroll-area ds-scroll-area--tall">
+            <div className="ds-scroll-area ds-scroll-area--fill">
               <ul className="space-y-2">
                 {recentTransactions.map((transaction) => (
-                  <li key={transaction.id} className="ds-log-row ds-log-row--compact">
+                  <li
+                    key={transaction.id}
+                    className="ds-log-row ds-log-row--compact transition-colors hover:border-accent/30 hover:bg-surface-muted/30"
+                  >
                     <div className="flex items-start justify-between gap-2">
                       <div className="min-w-0">
-                        <p className="truncate text-small font-medium">
+                        <p className="truncate text-small font-medium text-foreground">
                           {transaction.description}
                         </p>
                         <p className="mt-0.5 truncate font-mono text-micro text-foreground-muted">

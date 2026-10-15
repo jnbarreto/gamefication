@@ -7,7 +7,7 @@ services:
       POSTGRES_PASSWORD: gamefication
       POSTGRES_DB: gamefication
     ports:
-      - "5432:5432"
+      - "127.0.0.1:5432:5432"
     volumes:
       - postgres_data:/var/lib/postgresql/data
     healthcheck:
@@ -23,7 +23,7 @@ services:
       dockerfile: docker/Dockerfile.api
     container_name: gamefication-api
     ports:
-      - "3001:3001"
+      - "127.0.0.1:3001:3001"
     environment:
       PORT: "3001"
       DATABASE_URL: postgres://gamefication:gamefication@postgres:5432/gamefication
@@ -48,7 +48,7 @@ services:
       dockerfile: docker/Dockerfile.web
     container_name: gamefication-web
     ports:
-      - "5173:5173"
+      - "127.0.0.1:5173:5173"
     environment:
       VITE_PROXY_TARGET: http://api:3001
     volumes:
