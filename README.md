@@ -28,7 +28,7 @@ npm run docker:up
 ```
 
 - Postgres: `localhost:5432`
-- API: http://localhost:3000/api/v1/health
+- API: http://localhost:3001/api/v1/health
 - Web: http://localhost:5173 (proxies `/api` → API container)
 
 Stop containers: `npm run docker:down`

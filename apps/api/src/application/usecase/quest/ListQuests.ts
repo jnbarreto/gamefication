@@ -1,5 +1,6 @@
 import NotFoundError from "../../exception/NotFoundError.js";
 import type CharacterRepository from "../../repository/CharacterRepository.js";
+import type EvidenceRepository from "../../repository/EvidenceRepository.js";
 import type QuestMissionRepository from "../../repository/QuestMissionRepository.js";
 import type { ListQuestsFilter } from "../../repository/QuestRepository.js";
 import type QuestRepository from "../../repository/QuestRepository.js";
@@ -12,6 +13,7 @@ export default class ListQuests {
     private readonly questRepository: QuestRepository,
     private readonly missionRepository: QuestMissionRepository,
     private readonly timezone: string,
+    private readonly evidenceRepository?: EvidenceRepository,
   ) {}
 
   async execute(userId: string, filter: ListQuestsFilter = {}, referenceDate: Date = new Date()) {
@@ -33,10 +35,14 @@ export default class ListQuests {
       character.getId().toString(),
       filter,
     );
-    const missionsByQuestId = await this.missionRepository.findByQuestIds(
-      quests.map((quest) => quest.getId().toString()),
-    );
+    const questIds = quests.map((quest) => quest.getId().toString());
+    const [missionsByQuestId, evidencesByQuestId] = await Promise.all([
+      this.missionRepository.findByQuestIds(questIds),
+      this.evidenceRepository
+        ? this.evidenceRepository.findByEntities("QUEST", questIds)
+        : Promise.resolve(new Map()),
+    ]);
 
-    return { quests, missionsByQuestId };
+    return { quests, missionsByQuestId, evidencesByQuestId };
   }
 }

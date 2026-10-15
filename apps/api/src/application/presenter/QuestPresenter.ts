@@ -22,6 +22,7 @@ export type QuestMissionResponse = {
   displayOrder: number;
   isCompleted: boolean;
   completedAt: string | null;
+  durationSeconds: number | null;
 };
 
 export type QuestResponse = {
@@ -38,6 +39,10 @@ export type QuestResponse = {
   dueDate: string | null;
   completedAt: string | null;
   notes: string | null;
+  timerSeconds: number;
+  timerRunning: boolean;
+  timerStartedAt: string | null;
+  evidence: EvidenceResponse | null;
   createdAt: string;
   updatedAt: string;
 };
@@ -100,12 +105,24 @@ export function presentQuestMission(mission: QuestMission): QuestMissionResponse
     displayOrder: mission.getDisplayOrder(),
     isCompleted: mission.isMissionCompleted(),
     completedAt: mission.getCompletedAt()?.toISOString() ?? null,
+    durationSeconds: mission.getDurationSeconds(),
+  };
+}
+
+export function presentEvidence(
+  evidence: QuestCompletionEvidence | { type: string; value: string; description: string | null },
+): EvidenceResponse {
+  return {
+    type: evidence.type,
+    value: evidence.value,
+    description: evidence.description,
   };
 }
 
 export function presentQuest(
   quest: Quest,
   missions: QuestMission[] = [],
+  evidence: EvidenceResponse | null = null,
 ): QuestResponse {
   return {
     id: quest.getId().toString(),
@@ -124,6 +141,10 @@ export function presentQuest(
     dueDate: quest.getDueDate()?.toISOString() ?? null,
     completedAt: quest.getCompletedAt()?.toISOString() ?? null,
     notes: quest.getNotes(),
+    timerSeconds: quest.getTimerSeconds(),
+    timerRunning: quest.isTimerRunning(),
+    timerStartedAt: quest.getTimerStartedAt()?.toISOString() ?? null,
+    evidence,
     createdAt: quest.getCreatedAt().toISOString(),
     updatedAt: quest.getUpdatedAt().toISOString(),
   };
@@ -132,9 +153,14 @@ export function presentQuest(
 export function presentQuestsWithMissions(
   quests: Quest[],
   missionsByQuestId: Map<string, QuestMission[]>,
+  evidencesByQuestId: Map<string, EvidenceResponse> = new Map(),
 ): QuestResponse[] {
   return quests.map((quest) =>
-    presentQuest(quest, missionsByQuestId.get(quest.getId().toString()) ?? []),
+    presentQuest(
+      quest,
+      missionsByQuestId.get(quest.getId().toString()) ?? [],
+      evidencesByQuestId.get(quest.getId().toString()) ?? null,
+    ),
   );
 }
 
@@ -154,9 +180,10 @@ export function presentCreateQuestResult(
 export function presentQuestList(
   quests: Quest[],
   missionsByQuestId: Map<string, QuestMission[]> = new Map(),
+  evidencesByQuestId: Map<string, EvidenceResponse> = new Map(),
 ): QuestListResponse {
   return {
-    quests: presentQuestsWithMissions(quests, missionsByQuestId),
+    quests: presentQuestsWithMissions(quests, missionsByQuestId, evidencesByQuestId),
   };
 }
 
@@ -164,12 +191,14 @@ export function presentTodayQuests(result: {
   calendarDay: string;
   quests: Quest[];
   missionsByQuestId?: Map<string, QuestMission[]>;
+  evidencesByQuestId?: Map<string, EvidenceResponse>;
 }): TodayQuestsResponse {
   return {
     calendarDay: result.calendarDay,
     quests: presentQuestsWithMissions(
       result.quests,
       result.missionsByQuestId ?? new Map(),
+      result.evidencesByQuestId ?? new Map(),
     ),
   };
 }
@@ -179,14 +208,6 @@ export function presentStreak(streak: Streak): StreakResponse {
     currentCount: streak.getCurrentCount(),
     bestCount: streak.getBestCount(),
     lastActivityDay: streak.getLastActivityDay(),
-  };
-}
-
-function presentEvidence(evidence: QuestCompletionEvidence): EvidenceResponse {
-  return {
-    type: evidence.type,
-    value: evidence.value,
-    description: evidence.description,
   };
 }
 
@@ -200,13 +221,14 @@ export function presentCompleteQuestResult(
   },
   missions: QuestMission[] = [],
 ): CompleteQuestResponse {
+  const presentedEvidence = result.evidence ? presentEvidence(result.evidence) : null;
   return {
-    quest: presentQuest(result.quest, missions),
+    quest: presentQuest(result.quest, missions, presentedEvidence),
     character: presentCharacter(result.character),
     streak: presentStreak(result.streak),
     xpTransactions: result.xpTransactions.map((transaction) =>
       presentXpTransaction(transaction),
     ),
-    evidence: result.evidence ? presentEvidence(result.evidence) : null,
+    evidence: presentedEvidence,
   };
 }

@@ -204,6 +204,8 @@ const pt = {
     missionsProgress: "Missões {{completed}}/{{total}}",
     completeMissionsHint: "Conclua todas as missões para finalizar a quest.",
     noMissions: "Sem missões",
+    evidence: "Evidência",
+    evidenceTitle: "Evidência de Conclusão",
   },
   questBoard: {
     title: "Quadro de quests",
@@ -239,6 +241,29 @@ const pt = {
     deleteBoardConfirm: "Tem certeza de que deseja excluir o quadro \"{{name}}\"?",
     cannotDeleteLastBoard: "Não é possível excluir o único quadro.",
     defaultBoardName: "Quadro Principal",
+  },
+  questTimer: {
+    modalTitle: "Iniciar Jornada",
+    modalQuestion: "Deseja cronometrar esta jornada?",
+    modalHint:
+      "O tempo será registrado e a duração de cada missão será calculada conforme você as conclui.",
+    startWithTimer: "Cronometrar jornada",
+    startWithoutTimer: "Iniciar sem cronômetro",
+    chronometer: "Cronômetro",
+    timerLabel: "Tempo decorrido",
+    running: "Em andamento",
+    paused: "Pausado",
+    stopped: "Parado",
+    pause: "Pausar",
+    resume: "Retomar",
+    start: "Iniciar",
+    reset: "Resetar",
+    resetting: "Resetando…",
+    resetConfirmTitle: "Resetar cronômetro?",
+    resetConfirmMessage:
+      "O tempo desta quest voltará para 00:00:00. Esta ação não pode ser desfeita.",
+    resetConfirmAction: "Sim, resetar",
+    missionDurationTitle: "Duração desta missão",
   },
   skills: {
     title: "Habilidades",

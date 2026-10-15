@@ -23,10 +23,20 @@ type QuestCardsViewProps = {
   onReopen: (questId: string) => void;
   onSave: (questId: string, input: UpdateQuestRequest) => void;
   savingQuestId?: string | null;
-  onToggleMission: (questId: string, missionId: string, completed: boolean) => void;
+  onToggleMission: (
+    questId: string,
+    missionId: string,
+    completed: boolean,
+    durationSeconds?: number | null,
+  ) => void;
   onToggleEvidence: (questId: string | null) => void;
   onRemoveFromBoard?: (questId: string) => void;
   skillOptions?: Array<{ id: string; label: string }>;
+  onUpdateTimer?: (
+    questId: string,
+    action: "START" | "PAUSE" | "SYNC" | "RESET",
+    timerSeconds?: number,
+  ) => Promise<void>;
 };
 
 export default function QuestCardsView({
@@ -49,6 +59,7 @@ export default function QuestCardsView({
   onToggleEvidence,
   onRemoveFromBoard,
   skillOptions,
+  onUpdateTimer,
 }: QuestCardsViewProps) {
   const { t } = useTranslation();
   const [detailQuestId, setDetailQuestId] = useState<string | null>(null);
@@ -107,6 +118,7 @@ export default function QuestCardsView({
         }}
         onToggleMission={onToggleMission}
         onToggleEvidence={onToggleEvidence}
+        onUpdateTimer={onUpdateTimer}
       />
     </>
   );

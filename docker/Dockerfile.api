@@ -12,6 +12,6 @@ RUN npm ci --workspace=@gamefication/api --include-workspace-root
 COPY apps/api/tsconfig.json apps/api/tsconfig.build.json apps/api/
 COPY apps/api/src apps/api/src
 
-EXPOSE 3000
+EXPOSE 3001
 
 CMD ["npm", "run", "dev", "-w", "@gamefication/api"]

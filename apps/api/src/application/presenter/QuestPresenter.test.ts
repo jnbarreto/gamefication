@@ -76,4 +76,41 @@ describe("QuestPresenter", () => {
 
     expect(presentQuestList([quest]).quests).toHaveLength(1);
   });
+
+  it("maps quest evidence when present", () => {
+    const quest = Quest.create({
+      characterId: "550e8400-e29b-41d4-a716-446655440000",
+      title: "Completed quest with evidence",
+      type: QuestType.WORK,
+      difficulty: QuestDifficulty.MEDIUM,
+      skillAllocations: [
+        {
+          skillId: "550e8400-e29b-41d4-a716-446655440001",
+          xp: 25,
+        },
+      ],
+    });
+
+    const evidence = {
+      type: "URL",
+      value: "https://github.com/org/repo/pull/42",
+      description: "PR link",
+    };
+
+    const response = presentQuest(quest, [], evidence);
+    expect(response.evidence).toEqual({
+      type: "URL",
+      value: "https://github.com/org/repo/pull/42",
+      description: "PR link",
+    });
+
+    const listResponse = presentQuestList(
+      [quest],
+      new Map(),
+      new Map([[quest.getId().toString(), evidence]]),
+    );
+    expect(listResponse.quests[0].evidence?.value).toBe(
+      "https://github.com/org/repo/pull/42",
+    );
+  });
 });

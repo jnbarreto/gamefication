@@ -63,6 +63,7 @@ export default class GetDashboard {
       calendarDay: todayQuests.calendarDay,
       todayQuests: todayQuests.quests,
       missionsByQuestId: todayQuests.missionsByQuestId,
+      evidencesByQuestId: todayQuests.evidencesByQuestId,
       topSkills,
       recentTransactions,
       streak,

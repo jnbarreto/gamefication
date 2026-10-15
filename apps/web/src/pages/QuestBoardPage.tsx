@@ -15,8 +15,10 @@ import {
   startQuest,
   updateQuest,
   updateQuestMission,
+  updateQuestTimer,
   type UpdateQuestRequest,
 } from "@/lib/api/quests";
+import StartQuestTimerModal from "@/components/quests/StartQuestTimerModal";
 import { fetchSkillTree } from "@/lib/api/skills";
 import type { QuestResponse, SkillCategoryResponse } from "@/lib/api/types";
 import { useConfirm } from "@/lib/confirm/ConfirmDialogProvider";
@@ -50,6 +52,7 @@ export default function QuestBoardPage() {
   const [togglingMissionId, setTogglingMissionId] = useState<string | null>(null);
   const [showEvidenceForId, setShowEvidenceForId] = useState<string | null>(null);
   const [evidenceUrl, setEvidenceUrl] = useState("");
+  const [pendingStartQuest, setPendingStartQuest] = useState<QuestResponse | null>(null);
 
   const {
     boards,
@@ -124,12 +127,21 @@ export default function QuestBoardPage() {
       .filter((quest): quest is QuestResponse => Boolean(quest));
   }, [quests, selectedIds]);
 
-  async function handleStart(questId: string) {
+  function handleStart(questId: string) {
+    const targetQuest = quests.find((q) => q.id === questId);
+    if (targetQuest) {
+      setPendingStartQuest(targetQuest);
+    } else {
+      void executeStart(questId, false);
+    }
+  }
+
+  async function executeStart(questId: string, startTimer: boolean) {
     setActionError(null);
     setActionQuestId(questId);
 
     try {
-      await startQuest(questId);
+      await startQuest(questId, { startTimer });
       await loadQuests();
     } catch (err: unknown) {
       setActionError(
@@ -141,6 +153,26 @@ export default function QuestBoardPage() {
       );
     } finally {
       setActionQuestId(null);
+    }
+  }
+
+  async function handleUpdateTimer(
+    questId: string,
+    action: "START" | "PAUSE" | "SYNC" | "RESET",
+    timerSeconds?: number,
+  ) {
+    setActionError(null);
+    try {
+      await updateQuestTimer(questId, action, timerSeconds);
+      await loadQuests();
+    } catch (err: unknown) {
+      setActionError(
+        err instanceof ApiError
+          ? err.message
+          : err instanceof Error
+            ? err.message
+            : t("errors.updateQuest"),
+      );
     }
   }
 
@@ -249,12 +281,13 @@ export default function QuestBoardPage() {
     questId: string,
     missionId: string,
     completed: boolean,
+    durationSeconds?: number | null,
   ) {
     setActionError(null);
     setTogglingMissionId(missionId);
 
     try {
-      await updateQuestMission(questId, missionId, completed);
+      await updateQuestMission(questId, missionId, completed, durationSeconds);
       await loadQuests();
     } catch (err: unknown) {
       setActionError(
@@ -296,6 +329,7 @@ export default function QuestBoardPage() {
     onToggleEvidence: handleToggleEvidence,
     onRemoveFromBoard: removeQuest,
     onReorderQuests: reorderQuests,
+    onUpdateTimer: handleUpdateTimer,
   };
 
   if (error) {
@@ -401,6 +435,18 @@ export default function QuestBoardPage() {
           <QuestCardsView {...sharedViewProps} />
         )}
       </section>
+
+      <StartQuestTimerModal
+        open={pendingStartQuest !== null}
+        questTitle={pendingStartQuest?.title ?? ""}
+        onConfirm={async (startTimer) => {
+          if (!pendingStartQuest) return;
+          const id = pendingStartQuest.id;
+          setPendingStartQuest(null);
+          await executeStart(id, startTimer);
+        }}
+        onClose={() => setPendingStartQuest(null)}
+      />
     </div>
   );
 }

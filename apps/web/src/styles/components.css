@@ -337,7 +337,7 @@
   }
 
   .ds-panel {
-    @apply rounded-panel border border-border/25 bg-surface p-6 shadow-[inset_0_1px_0_rgba(255,255,255,0.03)];
+    @apply flex flex-col rounded-panel border border-border/25 bg-surface p-6 shadow-[inset_0_1px_0_rgba(255,255,255,0.03)];
   }
 
   .ds-panel--compact {
@@ -365,7 +365,7 @@
   }
 
   .ds-panel__body {
-    @apply mt-4;
+    @apply mt-4 flex-1 min-h-0 flex flex-col;
   }
 
   .ds-stat {
@@ -419,12 +419,30 @@
   .ds-scroll-area {
     @apply overflow-y-auto overscroll-y-contain;
     max-height: 15rem;
-    scrollbar-width: none;
-    -ms-overflow-style: none;
+    scrollbar-width: thin;
+    scrollbar-color: rgba(255, 255, 255, 0.18) transparent;
   }
 
   .ds-scroll-area::-webkit-scrollbar {
-    display: none;
+    width: 4px;
+  }
+
+  .ds-scroll-area::-webkit-scrollbar-track {
+    background: transparent;
+  }
+
+  .ds-scroll-area::-webkit-scrollbar-thumb {
+    background: rgba(255, 255, 255, 0.18);
+    border-radius: 9999px;
+  }
+
+  .ds-scroll-area::-webkit-scrollbar-thumb:hover {
+    background: rgba(255, 255, 255, 0.3);
+  }
+
+  .ds-scroll-area--fill {
+    @apply flex-1 min-h-0 h-full pr-1;
+    max-height: none;
   }
 
   .ds-scroll-area--tall {
@@ -1173,7 +1191,7 @@
   }
 
   .ds-quest-detail-modal {
-    @apply max-w-lg;
+    @apply max-w-lg max-h-[90vh] overflow-y-auto;
   }
 
   .ds-quest-detail-modal__meta {
@@ -1185,7 +1203,42 @@
   }
 
   .ds-quest-detail-modal__missions {
-    @apply mt-4;
+    @apply mt-4 flex flex-col rounded-panel border border-border/20 bg-base/25 p-3;
+  }
+
+  .ds-quest-detail-modal__missions-label {
+    @apply mb-2 font-mono text-micro text-foreground-muted;
+  }
+
+  .ds-quest-detail-modal__mission-list {
+    @apply flex max-h-64 flex-col gap-1 overflow-y-auto pr-1;
+    scrollbar-width: thin;
+    scrollbar-color: rgba(255, 255, 255, 0.18) transparent;
+  }
+
+  .ds-quest-detail-modal__mission-list::-webkit-scrollbar {
+    width: 4px;
+  }
+
+  .ds-quest-detail-modal__mission-list::-webkit-scrollbar-track {
+    background: transparent;
+  }
+
+  .ds-quest-detail-modal__mission-list::-webkit-scrollbar-thumb {
+    background: rgba(255, 255, 255, 0.18);
+    border-radius: 9999px;
+  }
+
+  .ds-quest-detail-modal__mission-list::-webkit-scrollbar-thumb:hover {
+    background: rgba(255, 255, 255, 0.3);
+  }
+
+  .ds-quest-detail-modal__mission {
+    @apply flex items-start gap-2.5 rounded px-2 py-1 text-micro text-foreground transition-colors hover:bg-white/[0.04] cursor-pointer;
+  }
+
+  .ds-quest-detail-modal__mission input[type="checkbox"] {
+    @apply mt-0.5 shrink-0 accent-accent cursor-pointer;
   }
 
   .ds-quest-detail-modal__actions {

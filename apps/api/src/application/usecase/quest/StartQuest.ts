@@ -9,7 +9,11 @@ export default class StartQuest {
     private readonly questRepository: QuestRepository,
   ) {}
 
-  async execute(userId: string, questId: string): Promise<Quest> {
+  async execute(
+    userId: string,
+    questId: string,
+    options?: { startTimer?: boolean },
+  ): Promise<Quest> {
     const character = await this.characterRepository.findByUserId(userId);
 
     if (!character) {
@@ -22,7 +26,7 @@ export default class StartQuest {
       throw new NotFoundError("Quest not found");
     }
 
-    quest.start();
+    quest.start(options?.startTimer ?? false);
     await this.questRepository.update(quest);
 
     return quest;

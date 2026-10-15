@@ -2,6 +2,7 @@ import { useEffect, useState } from "react";
 import { useTranslation } from "react-i18next";
 
 import { Badge } from "@/components/design";
+import { useConfirm } from "@/lib/confirm/ConfirmDialogProvider";
 import type { UpdateQuestRequest } from "@/lib/api/quests";
 import type { QuestResponse } from "@/lib/api/types";
 import {
@@ -25,8 +26,16 @@ import {
 } from "@/lib/quests/questStatusPill";
 
 import QuestMissionFields from "./QuestMissionFields";
-
 import { LinkifiedText } from "../ui/LinkifiedText";
+import { updateQuestTimer } from "@/lib/api/quests";
+import type { QuestMissionResponse } from "@/lib/api/types";
+import {
+  computeLiveQuestSeconds,
+  formatDigitalTimer,
+  formatDuration,
+} from "@/lib/quests/questTimer";
+import ampulhetaAnimadaGif from "../../../assets/animacao_ampulheta.gif";
+import ampulhetaEstaticaImg from "../../../assets/ampulheta_estatica.png";
 
 type QuestDetailModalProps = {
   quest: QuestResponse | null;
@@ -46,8 +55,18 @@ type QuestDetailModalProps = {
   onCancel: (questId: string) => void;
   onReopen: (questId: string) => void;
   onSave: (questId: string, input: UpdateQuestRequest) => void;
-  onToggleMission: (questId: string, missionId: string, completed: boolean) => void;
+  onToggleMission: (
+    questId: string,
+    missionId: string,
+    completed: boolean,
+    durationSeconds?: number | null,
+  ) => void;
   onToggleEvidence: (questId: string | null) => void;
+  onUpdateTimer?: (
+    questId: string,
+    action: "START" | "PAUSE" | "SYNC" | "RESET",
+    timerSeconds?: number,
+  ) => Promise<void>;
 };
 
 export default function QuestDetailModal({
@@ -70,8 +89,10 @@ export default function QuestDetailModal({
   onSave,
   onToggleMission,
   onToggleEvidence,
+  onUpdateTimer,
 }: QuestDetailModalProps) {
   const { t } = useTranslation();
+  const { confirm } = useConfirm();
   const [isEditing, setIsEditing] = useState(false);
   const [showAdvanced, setShowAdvanced] = useState(false);
   const [editTitle, setEditTitle] = useState("");
@@ -80,6 +101,94 @@ export default function QuestDetailModal({
   const [editSkillId, setEditSkillId] = useState("");
   const [editMissions, setEditMissions] = useState<QuestMissionDraft[]>([{ title: "" }]);
   const isSaving = quest !== null && savingQuestId === quest.id;
+
+  const [liveSeconds, setLiveSeconds] = useState(0);
+  const [isUpdatingTimer, setIsUpdatingTimer] = useState(false);
+
+  useEffect(() => {
+    if (!open || !quest) {
+      setLiveSeconds(0);
+      return;
+    }
+
+    setLiveSeconds(computeLiveQuestSeconds(quest));
+
+    if (!quest.timerRunning) return;
+
+    const interval = setInterval(() => {
+      setLiveSeconds(computeLiveQuestSeconds(quest));
+    }, 1000);
+
+    return () => clearInterval(interval);
+  }, [open, quest]);
+
+  async function handleToggleTimer() {
+    if (!quest) return;
+    setIsUpdatingTimer(true);
+    try {
+      const action = quest.timerRunning ? "PAUSE" : "START";
+      if (onUpdateTimer) {
+        await onUpdateTimer(quest.id, action);
+      } else {
+        await updateQuestTimer(quest.id, action);
+      }
+    } catch {
+      // handled by caller or state
+    } finally {
+      setIsUpdatingTimer(false);
+    }
+  }
+
+  async function handleResetTimer() {
+    if (!quest) return;
+    const ok = await confirm({
+      title: t("questTimer.resetConfirmTitle", { defaultValue: "Resetar cronômetro?" }),
+      message: t("questTimer.resetConfirmMessage", {
+        defaultValue:
+          "O tempo desta quest voltará para 00:00:00. Esta ação não pode ser desfeita.",
+      }),
+      confirmLabel: t("questTimer.resetConfirmAction", { defaultValue: "Sim, resetar" }),
+      cancelLabel: t("common.cancel", { defaultValue: "Cancelar" }),
+      variant: "danger",
+    });
+
+    if (!ok) return;
+
+    setIsUpdatingTimer(true);
+    try {
+      if (onUpdateTimer) {
+        await onUpdateTimer(quest.id, "RESET");
+      } else {
+        await updateQuestTimer(quest.id, "RESET");
+      }
+      setLiveSeconds(0);
+    } catch {
+      // handled by caller or state
+    } finally {
+      setIsUpdatingTimer(false);
+    }
+  }
+
+  function handleMissionToggle(mission: QuestMissionResponse, checked: boolean) {
+    if (!quest) return;
+
+    if (!checked) {
+      onToggleMission(quest.id, mission.id, false, null);
+      return;
+    }
+
+    const currentTimer = liveSeconds;
+    if (currentTimer > 0) {
+      const otherMissionsDuration = quest.missions
+        .filter((m) => m.isCompleted && m.id !== mission.id)
+        .reduce((sum, m) => sum + (m.durationSeconds ?? 0), 0);
+
+      const delta = Math.max(0, currentTimer - otherMissionsDuration);
+      onToggleMission(quest.id, mission.id, true, delta);
+    } else {
+      onToggleMission(quest.id, mission.id, true, null);
+    }
+  }
 
   useEffect(() => {
     if (!open || !quest) {
@@ -306,6 +415,68 @@ export default function QuestDetailModal({
           <p className="ds-quest-detail-modal__description">{activeQuest.description}</p>
         )}
 
+        {!isEditing &&
+          (activeQuest.status === "IN_PROGRESS" ||
+            activeQuest.timerRunning ||
+            liveSeconds > 0) && (
+            <div className="my-2.5 flex items-center justify-between gap-3 rounded border border-border/30 bg-surface-muted/30 px-3 py-1.5 transition-colors">
+              <div className="flex items-center gap-2.5">
+                <img
+                  src={activeQuest.timerRunning ? ampulhetaAnimadaGif : ampulhetaEstaticaImg}
+                  alt="Ampulheta"
+                  className="h-6 w-6 object-cover select-none rounded"
+                />
+                <span className="font-mono text-base font-semibold tracking-wider text-foreground">
+                  {formatDigitalTimer(liveSeconds)}
+                </span>
+              </div>
+
+              {activeQuest.status === "IN_PROGRESS" && (
+                <div className="flex items-center gap-1.5">
+                  <button
+                    type="button"
+                    className={`inline-flex items-center gap-1 rounded px-2 py-0.5 text-xs font-mono font-medium transition-colors ds-focus ${
+                      activeQuest.timerRunning
+                        ? "border border-amber-500/40 text-amber-300 bg-amber-500/10 hover:bg-amber-500/20"
+                        : "border border-accent/40 text-accent bg-accent/10 hover:bg-accent/20"
+                    }`}
+                    disabled={isUpdatingTimer || isBusy}
+                    onClick={handleToggleTimer}
+                  >
+                    {activeQuest.timerRunning ? (
+                      <>
+                        <span className="text-[10px]">⏸</span>
+                        <span>{t("questTimer.pause", { defaultValue: "Pausar" })}</span>
+                      </>
+                    ) : (
+                      <>
+                        <span className="text-[10px]">▶</span>
+                        <span>
+                          {liveSeconds > 0
+                            ? t("questTimer.resume", { defaultValue: "Retomar" })
+                            : t("questTimer.start", { defaultValue: "Iniciar" })}
+                        </span>
+                      </>
+                    )}
+                  </button>
+
+                  {liveSeconds > 0 && (
+                    <button
+                      type="button"
+                      className="inline-flex items-center gap-1 rounded border border-border/40 px-1.5 py-0.5 text-xs font-mono text-foreground-muted hover:text-danger hover:border-danger/40 hover:bg-danger/5 transition-colors ds-focus"
+                      title={t("questTimer.reset", { defaultValue: "Resetar cronômetro" })}
+                      disabled={isUpdatingTimer || isBusy}
+                      onClick={handleResetTimer}
+                    >
+                      <span className="text-[10px]">↺</span>
+                      <span>{t("questTimer.reset", { defaultValue: "Resetar" })}</span>
+                    </button>
+                  )}
+                </div>
+              )}
+            </div>
+          )}
+
         {isEditing ? (
           <div className="mt-6">
             <QuestMissionFields
@@ -316,17 +487,17 @@ export default function QuestDetailModal({
           </div>
         ) : (
           activeQuest.missions.length > 0 && (
-            <div className="ds-quest-board-card__missions ds-quest-detail-modal__missions">
-              <p className="ds-quest-board-card__missions-label">
+            <div className="ds-quest-detail-modal__missions">
+              <p className="ds-quest-detail-modal__missions-label">
                 {t("quests.missionsProgress", {
                   completed: missionDone,
                   total: activeQuest.missions.length,
                 })}
               </p>
-              <ul className="ds-quest-board-card__mission-list">
+              <ul className="ds-quest-detail-modal__mission-list">
                 {activeQuest.missions.map((mission) => (
                   <li key={mission.id}>
-                    <label className="ds-quest-board-card__mission">
+                    <label className="ds-quest-detail-modal__mission">
                       <input
                         type="checkbox"
                         checked={mission.isCompleted}
@@ -336,18 +507,54 @@ export default function QuestDetailModal({
                           isBusy
                         }
                         onChange={(event) =>
-                          onToggleMission(activeQuest.id, mission.id, event.target.checked)
+                          handleMissionToggle(mission, event.target.checked)
                         }
                       />
                       <span className={mission.isCompleted ? "line-through opacity-70" : ""}>
                         <LinkifiedText text={mission.title} />
                       </span>
+                      {mission.durationSeconds != null && (
+                        <span
+                          className="ml-auto inline-flex items-center gap-1 font-mono text-micro text-accent/80 tracking-tight shrink-0 font-medium select-none"
+                          title={t("questTimer.missionDurationTitle", {
+                            defaultValue: "Duração desta missão",
+                          })}
+                        >
+                          <span className="opacity-50 text-[10px]">⧗</span>
+                          <span>{formatDuration(mission.durationSeconds)}</span>
+                        </span>
+                      )}
                     </label>
                   </li>
                 ))}
               </ul>
             </div>
           )
+        )}
+
+        {!isEditing && activeQuest.evidence?.value && (
+          <div className="my-3 rounded border border-border/40 bg-surface-muted/30 p-2.5 space-y-1">
+            <span className="text-[11px] font-flavor font-medium uppercase tracking-wider text-foreground-muted block">
+              {t("quests.evidenceTitle", { defaultValue: "Evidência de Conclusão" })}
+            </span>
+            <div className="flex items-center gap-2">
+              <span className="text-accent text-xs select-none">🔗</span>
+              <a
+                href={activeQuest.evidence.value}
+                target="_blank"
+                rel="noreferrer noopener"
+                className="text-accent hover:underline break-all font-mono text-xs inline-flex items-center gap-1 ds-focus rounded"
+              >
+                <span>{activeQuest.evidence.value}</span>
+                <span className="text-[10px]">↗</span>
+              </a>
+            </div>
+            {activeQuest.evidence.description && (
+              <p className="text-micro text-foreground-muted italic pt-0.5">
+                {activeQuest.evidence.description}
+              </p>
+            )}
+          </div>
         )}
 
         <div className="ds-quest-detail-modal__actions">

@@ -52,6 +52,7 @@ describe("MigrationLoader", () => {
       "202609140008",
       "202609140009",
       "202609140010",
+      "202609140011",
     ]);
     expect(migrations[7]?.name).toBe("auth_tokens");
     expect(migrations[6]?.name).toBe("users_and_auth");

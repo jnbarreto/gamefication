@@ -86,8 +86,13 @@ export function createQuest(input: CreateQuestRequest): Promise<CreateQuestRespo
   return apiPost<CreateQuestResponse>("/quests", input);
 }
 
-export function startQuest(questId: string): Promise<StartQuestResponse> {
-  return apiPost<StartQuestResponse>(`/quests/${questId}/start`);
+export function startQuest(
+  questId: string,
+  options?: { startTimer?: boolean },
+): Promise<StartQuestResponse> {
+  return apiPost<StartQuestResponse>(`/quests/${questId}/start`, {
+    startTimer: options?.startTimer ?? false,
+  });
 }
 
 export function completeQuest(
@@ -119,6 +124,21 @@ export function updateQuestMission(
   questId: string,
   missionId: string,
   completed: boolean,
+  durationSeconds?: number | null,
 ): Promise<{ mission: QuestMissionResponse }> {
-  return apiPatch(`/quests/${questId}/missions/${missionId}`, { completed });
+  return apiPatch(`/quests/${questId}/missions/${missionId}`, {
+    completed,
+    durationSeconds,
+  });
+}
+
+export function updateQuestTimer(
+  questId: string,
+  action: "START" | "PAUSE" | "SYNC" | "RESET",
+  timerSeconds?: number,
+): Promise<StartQuestResponse> {
+  return apiPatch<StartQuestResponse>(`/quests/${questId}/timer`, {
+    action,
+    timerSeconds,
+  });
 }

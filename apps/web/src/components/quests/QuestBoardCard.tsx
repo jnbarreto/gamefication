@@ -5,6 +5,7 @@ import { Badge, questItemClass } from "@/components/design";
 import type { QuestResponse } from "@/lib/api/types";
 import { completedMissionCount } from "@/lib/quests/questMissionProgress";
 import { questReopenPillButtonClass } from "@/lib/quests/questStatusPill";
+import { formatDuration } from "@/lib/quests/questTimer";
 import { LinkifiedText } from "../ui/LinkifiedText";
 
 type QuestBoardCardProps = {
@@ -30,9 +31,14 @@ type QuestBoardCardProps = {
 type MissionPreviewRowProps = {
   title: string;
   isCompleted: boolean;
+  durationSeconds?: number | null;
 };
 
-function MissionPreviewRow({ title, isCompleted }: MissionPreviewRowProps) {
+function MissionPreviewRow({
+  title,
+  isCompleted,
+  durationSeconds,
+}: MissionPreviewRowProps) {
   return (
     <div className="ds-quest-board-card__mission ds-quest-board-card__mission--preview">
       <input
@@ -51,6 +57,12 @@ function MissionPreviewRow({ title, isCompleted }: MissionPreviewRowProps) {
           <LinkifiedText text={title} />
         </span>
       </span>
+      {durationSeconds != null && (
+        <span className="ml-auto inline-flex items-center gap-0.5 text-micro font-mono text-accent/80 tracking-tight shrink-0 font-medium">
+          <span className="opacity-50 text-[10px]">⧗</span>
+          <span>{formatDuration(durationSeconds)}</span>
+        </span>
+      )}
     </div>
   );
 }
@@ -165,6 +177,28 @@ export default function QuestBoardCard({
         <p className="ds-quest-board-card__meta">
           {quest.type} · {quest.difficulty} ·{" "}
           <span className="text-xp">{quest.baseXp} {t("common.xp")}</span>
+          {(quest.timerRunning || (quest.timerSeconds != null && quest.timerSeconds > 0)) && (
+            <>
+              {" "}·{" "}
+              <span
+                className={`inline-flex items-center gap-1 font-mono text-micro ${
+                  quest.timerRunning
+                    ? "text-accent font-medium"
+                    : "text-foreground-muted"
+                }`}
+                title={t("questTimer.timerLabel", { defaultValue: "Tempo decorrido" })}
+              >
+                <span className={`opacity-60 text-[10px] ${quest.timerRunning ? "animate-pulse text-accent" : ""}`}>
+                  ⧗
+                </span>
+                <span>
+                  {quest.timerRunning
+                    ? t("questTimer.running", { defaultValue: "Timer ativo" })
+                    : formatDuration(quest.timerSeconds!)}
+                </span>
+              </span>
+            </>
+          )}
         </p>
       </header>
 
@@ -190,6 +224,7 @@ export default function QuestBoardCard({
                   <MissionPreviewRow
                     title={mission.title}
                     isCompleted={mission.isCompleted}
+                    durationSeconds={mission.durationSeconds}
                   />
                 </li>
               ))}
@@ -229,12 +264,26 @@ export default function QuestBoardCard({
         )}
 
         {quest.status === "COMPLETED" && (
-          <Badge
-            variant="success"
-            className="w-full h-full flex items-center justify-center py-0"
-          >
-            {t(`enums.questStatus.${quest.status}`, { defaultValue: quest.status })}
-          </Badge>
+          <div className="flex w-full h-full items-center gap-1.5">
+            <Badge
+              variant="success"
+              className="flex-1 h-full flex items-center justify-center py-0"
+            >
+              {t(`enums.questStatus.${quest.status}`, { defaultValue: quest.status })}
+            </Badge>
+            {quest.evidence?.value && (
+              <a
+                href={quest.evidence.value}
+                target="_blank"
+                rel="noreferrer noopener"
+                className="inline-flex items-center justify-center h-full px-2.5 rounded border border-accent/40 bg-accent/10 text-accent hover:bg-accent/20 transition-colors text-xs font-mono ds-focus shrink-0"
+                title={`${t("quests.evidence", { defaultValue: "Evidência" })}: ${quest.evidence.value}`}
+                onClick={(e) => e.stopPropagation()}
+              >
+                <span>🔗</span>
+              </a>
+            )}
+          </div>
         )}
 
         {quest.status === "CANCELLED" && (

@@ -46,6 +46,9 @@ export type RebuildQuestProps = {
   notes: string | null;
   calendarDay: string | null;
   calendarWeekStart: string | null;
+  timerSeconds?: number;
+  timerRunning?: boolean;
+  timerStartedAt?: Date | null;
   createdAt: Date;
   updatedAt: Date;
 };
@@ -66,6 +69,9 @@ export default class Quest {
     private notes: string | null,
     private calendarDay: string | null,
     private calendarWeekStart: string | null,
+    private timerSeconds: number,
+    private timerRunning: boolean,
+    private timerStartedAt: Date | null,
     private readonly createdAt: Date,
     private updatedAt: Date,
   ) {}
@@ -93,6 +99,9 @@ export default class Quest {
       props.notes?.trim() || null,
       props.calendarDay ?? null,
       props.calendarWeekStart ?? null,
+      0,
+      false,
+      null,
       now,
       now,
     );
@@ -116,22 +125,78 @@ export default class Quest {
       props.notes,
       props.calendarDay,
       props.calendarWeekStart,
+      props.timerSeconds ?? 0,
+      props.timerRunning ?? false,
+      props.timerStartedAt ?? null,
       props.createdAt,
       props.updatedAt,
     );
   }
 
-  start(): void {
+  start(startTimer: boolean = false, startedAt: Date = new Date()): void {
     this.transitionTo(QuestStatus.IN_PROGRESS);
+    if (startTimer) {
+      this.timerRunning = true;
+      this.timerStartedAt = startedAt;
+    }
   }
 
   complete(completedAt: Date = new Date()): void {
+    if (this.timerRunning && this.timerStartedAt) {
+      const elapsed = Math.max(
+        0,
+        Math.floor((completedAt.getTime() - this.timerStartedAt.getTime()) / 1000),
+      );
+      this.timerSeconds += elapsed;
+      this.timerRunning = false;
+      this.timerStartedAt = null;
+    }
     this.transitionTo(QuestStatus.COMPLETED);
     this.completedAt = completedAt;
   }
 
   cancel(): void {
+    this.timerRunning = false;
+    this.timerStartedAt = null;
     this.transitionTo(QuestStatus.CANCELLED);
+  }
+
+  startTimer(startedAt: Date = new Date()): void {
+    if (this.timerRunning) return;
+    this.timerRunning = true;
+    this.timerStartedAt = startedAt;
+    this.touch();
+  }
+
+  pauseTimer(pausedAt: Date = new Date()): void {
+    if (!this.timerRunning) return;
+    if (this.timerStartedAt) {
+      const elapsed = Math.max(
+        0,
+        Math.floor((pausedAt.getTime() - this.timerStartedAt.getTime()) / 1000),
+      );
+      this.timerSeconds += elapsed;
+    }
+    this.timerRunning = false;
+    this.timerStartedAt = null;
+    this.touch();
+  }
+
+  resetTimer(): void {
+    this.timerSeconds = 0;
+    this.timerRunning = false;
+    this.timerStartedAt = null;
+    this.touch();
+  }
+
+  syncTimer(timerSeconds: number): void {
+    if (timerSeconds >= 0) {
+      this.timerSeconds = timerSeconds;
+      if (this.timerRunning) {
+        this.timerStartedAt = new Date();
+      }
+      this.touch();
+    }
   }
 
   updateDetails(props: {
@@ -259,6 +324,29 @@ export default class Quest {
 
   getCalendarWeekStart(): string | null {
     return this.calendarWeekStart;
+  }
+
+  getTimerSeconds(): number {
+    return this.timerSeconds;
+  }
+
+  isTimerRunning(): boolean {
+    return this.timerRunning;
+  }
+
+  getTimerStartedAt(): Date | null {
+    return this.timerStartedAt;
+  }
+
+  getCurrentTotalTimerSeconds(): number {
+    if (this.timerRunning && this.timerStartedAt) {
+      const live = Math.max(
+        0,
+        Math.floor((Date.now() - this.timerStartedAt.getTime()) / 1000),
+      );
+      return this.timerSeconds + live;
+    }
+    return this.timerSeconds;
   }
 
   getCreatedAt(): Date {

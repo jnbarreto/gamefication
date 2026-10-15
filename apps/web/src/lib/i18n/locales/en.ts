@@ -204,6 +204,8 @@ const en = {
     missionsProgress: "Missions {{completed}}/{{total}}",
     completeMissionsHint: "Complete all missions before finishing the quest.",
     noMissions: "No missions",
+    evidence: "Evidence",
+    evidenceTitle: "Completion Evidence",
   },
   questBoard: {
     title: "Quest board",
@@ -239,6 +241,29 @@ const en = {
     deleteBoardConfirm: "Are you sure you want to delete board \"{{name}}\"?",
     cannotDeleteLastBoard: "Cannot delete the only board.",
     defaultBoardName: "Main Board",
+  },
+  questTimer: {
+    modalTitle: "Begin Journey",
+    modalQuestion: "Track time for this journey?",
+    modalHint:
+      "Time will be tracked and individual mission durations will be recorded as you complete them.",
+    startWithTimer: "Track journey time",
+    startWithoutTimer: "Begin without timer",
+    chronometer: "Chronometer",
+    timerLabel: "Elapsed time",
+    running: "Running",
+    paused: "Paused",
+    stopped: "Stopped",
+    pause: "Pause",
+    resume: "Resume",
+    start: "Start",
+    reset: "Reset",
+    resetting: "Resetting…",
+    resetConfirmTitle: "Reset chronometer?",
+    resetConfirmMessage:
+      "Recorded time for this quest will reset to 00:00:00. This cannot be undone.",
+    resetConfirmAction: "Yes, reset",
+    missionDurationTitle: "Duration of this mission",
   },
   skills: {
     title: "Skills",

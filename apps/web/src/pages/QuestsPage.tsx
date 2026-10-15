@@ -12,8 +12,10 @@ import {
   startQuest,
   updateQuest,
   updateQuestMission,
+  updateQuestTimer,
   type UpdateQuestRequest,
 } from "@/lib/api/quests";
+import StartQuestTimerModal from "@/components/quests/StartQuestTimerModal";
 import { fetchSkillTree } from "@/lib/api/skills";
 import type { QuestResponse } from "@/lib/api/types";
 import { useConfirm } from "@/lib/confirm/ConfirmDialogProvider";
@@ -64,6 +66,7 @@ export default function QuestsPage() {
   const [savingQuestId, setSavingQuestId] = useState<string | null>(null);
   const [togglingMissionId, setTogglingMissionId] = useState<string | null>(null);
   const [showEvidenceForId, setShowEvidenceForId] = useState<string | null>(null);
+  const [pendingStartQuest, setPendingStartQuest] = useState<QuestResponse | null>(null);
 
   const [title, setTitle] = useState("");
   const [type, setType] = useState<(typeof QUEST_TYPES)[number]>("WORK");
@@ -177,11 +180,20 @@ export default function QuestsPage() {
     }
   }
 
-  async function handleStart(questId: string) {
+  function handleStart(questId: string) {
+    const targetQuest = quests.find((q) => q.id === questId);
+    if (targetQuest) {
+      setPendingStartQuest(targetQuest);
+    } else {
+      void executeStart(questId, false);
+    }
+  }
+
+  async function executeStart(questId: string, startTimer: boolean) {
     setActionError(null);
 
     try {
-      await startQuest(questId);
+      await startQuest(questId, { startTimer });
       await loadQuests();
     } catch (err: unknown) {
       setActionError(
@@ -190,6 +202,26 @@ export default function QuestsPage() {
           : err instanceof Error
             ? err.message
             : t("errors.startQuest"),
+      );
+    }
+  }
+
+  async function handleUpdateTimer(
+    questId: string,
+    action: "START" | "PAUSE" | "SYNC" | "RESET",
+    timerSeconds?: number,
+  ) {
+    setActionError(null);
+    try {
+      await updateQuestTimer(questId, action, timerSeconds);
+      await loadQuests();
+    } catch (err: unknown) {
+      setActionError(
+        err instanceof ApiError
+          ? err.message
+          : err instanceof Error
+            ? err.message
+            : t("errors.updateQuest"),
       );
     }
   }
@@ -291,12 +323,13 @@ export default function QuestsPage() {
     questId: string,
     missionId: string,
     completed: boolean,
+    durationSeconds?: number | null,
   ) {
     setActionError(null);
     setTogglingMissionId(missionId);
 
     try {
-      await updateQuestMission(questId, missionId, completed);
+      await updateQuestMission(questId, missionId, completed, durationSeconds);
       await loadQuests();
     } catch (err: unknown) {
       setActionError(
@@ -495,6 +528,20 @@ export default function QuestsPage() {
                         {t("quests.reopen", { defaultValue: "Reopen" })}
                       </button>
                     )}
+
+                    {quest.evidence?.value && (
+                      <a
+                        href={quest.evidence.value}
+                        target="_blank"
+                        rel="noreferrer noopener"
+                        className="text-xs font-mono text-accent hover:underline inline-flex items-center gap-1"
+                        title={quest.evidence.value}
+                      >
+                        <span>🔗</span>
+                        <span>{t("quests.evidence", { defaultValue: "Evidência" })}</span>
+                        <span className="text-[10px]">↗</span>
+                      </a>
+                    )}
                   </div>
                 </div>
 
@@ -623,6 +670,19 @@ export default function QuestsPage() {
         onSave={handleSaveQuest}
         onToggleMission={handleToggleMission}
         onToggleEvidence={setShowEvidenceForId}
+        onUpdateTimer={handleUpdateTimer}
+      />
+
+      <StartQuestTimerModal
+        open={pendingStartQuest !== null}
+        questTitle={pendingStartQuest?.title ?? ""}
+        onConfirm={async (startTimer) => {
+          if (!pendingStartQuest) return;
+          const id = pendingStartQuest.id;
+          setPendingStartQuest(null);
+          await executeStart(id, startTimer);
+        }}
+        onClose={() => setPendingStartQuest(null)}
       />
     </div>
   );
